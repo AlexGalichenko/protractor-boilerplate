@@ -1,0 +1,28 @@
+{
+  "name": "protractor-boilerplate",
+  "version": "0.0.1",
+  "repository": "",
+  "scripts": {
+    "updateIE": "webdriver-manager update --ie",
+    "update": "webdriver-manager update --versions.chrome=2.32"
+  },
+  "devDependencies": {
+    "body-parser": "^1.18.2",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "cucumber": "^3.2.0",
+    "express": "^4.16.2",
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.3.2",
+    "gulp-express": "^0.3.5",
+    "gulp-protractor": "^4.1.0",
+    "gulp-util": "^3.0.8",
+    "mkdirp": "^0.5.1",
+    "multiple-cucumber-html-reporter": "^1.2.0",
+    "protractor": "^5.2.1",
+    "protractor-cucumber-framework": "^4.1.1",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
+    "xml2js": "^0.4.19"
+  }
+}
