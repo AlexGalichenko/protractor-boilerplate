@@ -4,7 +4,7 @@
 
 # Page Objects
 ##Page Map
-```
+```javascript
 const AbstractPageMap = require("protractor-boilerplate").AbstractPageMap;
 const LoginPage = require("./page/LoginPage");
 
@@ -29,7 +29,7 @@ class PageMap extends AbstractPageMap {
 | clazz | M | page class |
 
 ##Page
-```
+```javascript
 const Page = require("protractor-boilerplate").AbstractPage;
 const CustomComponent = require("./CustomComponent");
 
@@ -68,7 +68,7 @@ class CustomPage extends Page {
 | selector | M | css selector of element |
 
 ##Component
-```
+```javascript
 const Component = require("protractor-boilerplate").Component;
 
 class CustomComponent extends Component {
@@ -113,3 +113,36 @@ class CustomComponent extends Component {
 | alias | M | alias of the component |
 | selector | M | css selector of element |
      
+# Memory
+##Memory
+
+```javascript
+const Memory = require("protractor-boilerplate").Memory;
+
+defineSupportCode(({setDefaultTimeout, When}) => {
+
+    When(/^I remember "(.+)" value as "(.+)"$/, (alias, key) => {
+        const page = State.getPage();
+
+        return page.getElement(alias).getText()
+            .then((text) => {
+                Memory.setValue(key, text);
+            })
+    });
+}
+```
+
+###Methods
+* setValue
+
+| param | mandatory | description |
+|--------------|-----------|----------------------|
+| key | M | key of stored item |
+| value | M | value of stored item |
+
+* parseValue
+returns value by provided key, otherwise returns key
+
+| param | mandatory | description |
+|--------------|-----------|-----------------------|
+| value | M | a key or simple value |
