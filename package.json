@@ -6,7 +6,7 @@
     "updateIE": "webdriver-manager update --ie",
     "update": "webdriver-manager update --versions.chrome=2.32"
   },
-  "devDependencies": {
+  "dependencies": {
     "body-parser": "^1.18.2",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
