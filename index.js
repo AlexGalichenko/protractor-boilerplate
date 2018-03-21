@@ -14,4 +14,5 @@ exports.Reporter = require('./framework/reporter/Reporter');
 exports.GulpHelpers = require('./framework/helpers/GulpHelpers');
 exports.AbstractPageMap = require('./framework/page_manager/AbstractPageMap');
 exports.PageManager = require('./framework/page_manager/PageManager');
+exports.Configurator = require('./framework/configurator/Configurator');
 exports.tasks = require('./framework/gulp/tasks');
