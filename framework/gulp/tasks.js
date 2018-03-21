@@ -6,8 +6,8 @@ const protractor = require("gulp-protractor").protractor;
 const gp = require("gulp-protractor");
 const GulpHelpers = require("../helpers/GulpHelpers");
 const webdriver_update = require("gulp-protractor").webdriver_update_specific;
-const Reporter = require("./framework/reporter/Reporter");
-const TasksKiller = require("./framework/taskskiller/TasksKiller");
+const Reporter = require("../../framework/reporter/Reporter");
+const TasksKiller = require("../../framework/taskskiller/TasksKiller");
 const server = require("gulp-express");
 
 module.exports = function (gulp) {
