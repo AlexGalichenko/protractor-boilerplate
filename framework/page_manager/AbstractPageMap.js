@@ -6,7 +6,7 @@
 class AbstractPageMap {
 
     constructor() {
-        this.pages = [];
+        this.pages = new Map();
     }
 
     /**
@@ -15,7 +15,7 @@ class AbstractPageMap {
      * @param pageObject - class of page
      */
     definePage(alias, selector, pageObject) {
-        this.pages.push({
+        this.pages.set(alias, {
             alias: alias,
             selector: selector,
             pageObject: pageObject
@@ -28,7 +28,7 @@ class AbstractPageMap {
      * @return {Object} - page definition by alias
      */
     getPage(alias) {
-        const page = this.pages.find(item => item.alias === alias);
+        const page = this.pages.get(alias);
         if (page) {
             return page
         } else {
