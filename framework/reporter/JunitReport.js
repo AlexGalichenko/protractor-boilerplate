@@ -8,7 +8,6 @@ class JunitReport {
 
     /**
      * Build xml
-     * @return {{testsuites: (webdriver.promise.Promise|promise.Promise<any[]>|Array|wdpromise.Promise<any[]>|*|{İ, I, İ})}}
      */
     build() {
         return {
