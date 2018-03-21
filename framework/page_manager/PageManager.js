@@ -14,7 +14,6 @@ class PageManager {
                     return new RegExp(pageDefinition.selector).test(currentUrl);
                 });
             });
-
         }
     }
 
