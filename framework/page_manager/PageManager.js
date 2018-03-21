@@ -10,10 +10,9 @@ class PageManager {
         return function () {
             return browser.getCurrentUrl().then(currentUrl => {
                 let pageDefinitions = pageMap.pages;
-                let pageClass = pageDefinitions.find(pageDefinition => {
+                return pageDefinitions.find(pageDefinition => {
                     return new RegExp(pageDefinition.selector).test(currentUrl);
                 });
-                return new pageClass.pageObject();
             });
 
         }
