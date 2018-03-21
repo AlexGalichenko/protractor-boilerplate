@@ -1,5 +1,3 @@
-"use strict";
-
 class State {
 
     /**
@@ -15,8 +13,7 @@ class State {
      * @param pageName
      */
     static setPage(pageName) {
-        const pageConstructor = this.pageMap.getPage(pageName).pageObject;
-        this.page = new pageConstructor();
+        this.page = this.pageMap.getPage(pageName).pageObject;
     }
 
     /**
