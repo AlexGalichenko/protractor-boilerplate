@@ -35,8 +35,7 @@ class Memory {
      * @throws {Error}
      */
     static parseValue(key) {
-
-        const MEMORY_REGEXP = /^(\$+|#)/g;
+        const MEMORY_REGEXP = /^(\$+|#|!)/g;
 
         const prefix = key.match(MEMORY_REGEXP) ? key.match(MEMORY_REGEXP).pop() : "";
         const parsedKey = key.replace(prefix, "");
@@ -44,9 +43,9 @@ class Memory {
         switch (prefix) {
             case "$": return this._getMemoryValue(parsedKey); break;
             case "#": return this._getCalculableValue(parsedKey); break;
-            case "": return parsedKey; break;
             case "!": return this._getConstantValue(parsedKey); break;
-            default: throw new Error(`${prefix} is not defined`)
+            case "": return parsedKey; break;
+            default: throw new Error(`${parsedKey} is not defined`)
         }
 
     }
