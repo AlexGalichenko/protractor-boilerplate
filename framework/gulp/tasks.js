@@ -9,11 +9,20 @@ const webdriver_update = require("gulp-protractor").webdriver_update_specific;
 const Reporter = require("../../framework/reporter/Reporter");
 const TasksKiller = require("../../framework/taskskiller/TasksKiller");
 const server = require("gulp-express");
+const CredentialManager = require("../credential_manager/ServerCredentialManager");
 
-module.exports = function (gulp) {
+module.exports = function (gulp, envs, credentialManagerClass = CredentialManager, serverPath = path.resolve("./credential_server.js")) {
     gulp.task("folders", () => {
         return gulp.src("test", {read: false})
             .pipe(clean());
+    });
+
+    gulp.task("test:prepare_folders", ["folders"], () => {
+        let promises = [];
+        const creds = envs[util.env.env].credentials;
+        promises.push(credentialManagerClass.createPool(creds));
+        promises.push(GulpHelpers.prepareFolders());
+        return Promise.all(promises);
     });
 
     gulp.task("test:driver_update", ["test:prepare_folders"], webdriver_update({
@@ -41,9 +50,9 @@ module.exports = function (gulp) {
             args.push(util.env.baseUrl);
         }
 
-        gulp.src(["./cucumber/features/*.feature"])
+        gulp.src([])
             .pipe(protractor({
-                configFile: "./e2e/protractor.conf.js",
+                configFile: path.resolve("./protractor.conf.js"),
                 args: args,
                 autoStartStopServer: true
             }))
@@ -65,6 +74,6 @@ module.exports = function (gulp) {
     });
 
     gulp.task("c_server", () => {
-        server.run(["../credential_server/server.js"]);
+        server.run([serverPath]);
     });
 };
