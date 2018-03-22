@@ -45,14 +45,18 @@ class AbstractPage {
     getElement(key) {
         const tokens = key.split(/\s*>\s*/);
         const firstToken = tokens.shift();
-        let currentProtractorElement = this._getProtractorElement(null, this, firstToken);
-        let currentComponent = this._getComponent(this, firstToken);
-        for (let token of tokens) {
-            currentProtractorElement = this._getProtractorElement(currentProtractorElement, currentComponent, token);
-            currentComponent = this._getComponent(currentComponent, token);
-        }
 
-        return currentProtractorElement;
+        const {protractorElement} = tokens.reduce((current, token) => {
+            return {
+                protractorElement: this._getProtractorElement(current.protractorElement, current.component, token),
+                component: this._getComponent(current.component, token)
+            }
+        }, {
+            protractorElement: this._getProtractorElement(null, this, firstToken),
+            component: this._getComponent(this, firstToken)
+        });
+
+        return protractorElement;
     }
 
     /**
@@ -60,47 +64,71 @@ class AbstractPage {
      * @param currentProtractorElement
      * @param currentComponent
      * @param token
-     * @return {*}
+     * @return {ProtractorElement|ProtractorCollection}
      * @private
      */
     _getProtractorElement(currentProtractorElement, currentComponent, token) {
         const {index, alias} = this._parseToken(token);
         if (index !== null) {
-            const newElement = currentComponent.elements.get(alias);
-            if (currentProtractorElement) {
-                if (newElement.isCollection) {
-                    return currentProtractorElement.all(by.css(newElement.selector)).get(index)
-                } else {
-                    throw Error(`${alias} is not collection`)
-                }
+            return this._getElementOfCollection(currentProtractorElement, currentComponent, alias, index)
+        } else {
+            return this._getElementOrCollection(currentProtractorElement, currentComponent, alias)
+        }
+    }
+
+    /**
+     * Get protractor element by index
+     * @param currentProtractorElement
+     * @param currentComponent
+     * @param alias
+     * @param index
+     * @return {ProtractorElement}
+     * @private
+     */
+    _getElementOfCollection(currentProtractorElement, currentComponent, alias, index) {
+        const newElement = currentComponent.elements.get(alias);
+        if (currentProtractorElement) {
+            if (newElement.isCollection) {
+                return currentProtractorElement.all(by.css(newElement.selector)).get(index)
             } else {
-                if (newElement.isCollection) {
-                    return element.all(by.css(newElement.selector)).get(index)
+                throw new Error(`${alias} is not collection`)
+            }
+        } else {
+            if (newElement.isCollection) {
+                return element.all(by.css(newElement.selector)).get(index)
+            } else {
+                throw new Error(`${alias} is not collection`)
+            }
+        }
+    }
+
+    /**
+     * Get protractor element or collection
+     * @param currentProtractorElement
+     * @param currentComponent
+     * @param alias
+     * @return {ProtractorElement|ProtractorCollection}
+     * @private
+     */
+    _getElementOrCollection(currentProtractorElement, currentComponent, alias) {
+        const newElement = currentComponent.elements.get(alias);
+        if (currentProtractorElement) {
+            if (newElement.isCollection) {
+                return currentProtractorElement.all(by.css(newElement.selector))
+            } else {
+                if (currentProtractorElement.count) {
+                    return currentProtractorElement.all(by.css(newElement.selector))
                 } else {
-                    throw Error(`${alias} is not collection`)
+                    return currentProtractorElement.element(by.css(newElement.selector))
                 }
             }
         } else {
-            const newElement = currentComponent.elements.get(token);
-            if (currentProtractorElement) {
-                if (newElement.isCollection) {
-                    return currentProtractorElement.all(by.css(newElement.selector))
-                } else {
-                    if (currentProtractorElement.count) {
-                        return currentProtractorElement.all(by.css(newElement.selector))
-                    } else {
-                        return currentProtractorElement.element(by.css(newElement.selector))
-                    }
-                }
+            if (newElement.isCollection) {
+                return element.all(by.css(newElement.selector))
             } else {
-                if (newElement.isCollection) {
-                    return element.all(by.css(newElement.selector))
-                } else {
-                    return element(by.css(newElement.selector))
-                }
+                return element(by.css(newElement.selector))
             }
         }
-
     }
 
     /**
