@@ -45,27 +45,18 @@ class AbstractPage {
     getElement(key) {
         const tokens = key.split(/\s*>\s*/);
         const firstToken = tokens.shift();
-        // let currentProtractorElement = this._getProtractorElement(null, this, firstToken);
-        // let currentComponent = this._getComponent(this, firstToken);
-        //
-        // for (let token of tokens) {
-        //     currentProtractorElement = this._getProtractorElement(currentProtractorElement, currentComponent, token);
-        //     currentComponent = this._getComponent(currentComponent, token);
-        // }
 
-        const {currentProtractorElement, currentComponent} = tokens.reduce((current, token) => {
-            const currentComponent = this._getComponent(current.component, token);
-            const currentProtractorElement = this._getProtractorElement(current.protractorElement, currentComponent, token);
+        const {protractorElement} = tokens.reduce((current, token) => {
             return {
-                protractorElement: currentProtractorElement,
-                component: currentComponent
+                protractorElement: this._getProtractorElement(current.protractorElement, current.component, token),
+                component: this._getComponent(current.component, token)
             }
         }, {
             protractorElement: this._getProtractorElement(null, this, firstToken),
             component: this._getComponent(this, firstToken)
         });
 
-        return currentProtractorElement;
+        return protractorElement;
     }
 
     /**
