@@ -8,24 +8,28 @@ class AbstractPage {
     }
 
     /**
-     *
+     * Define element
      * @param alias
      * @param selector
+     * @param selectorType
+     * @param text
      */
-    defineElement(alias, selector) {
-        this.elements.set(alias, new Element(alias, selector))
+    defineElement(alias, selector, selectorType, text) {
+        this.elements.set(alias, new Element(alias, selector, selectorType, text))
     }
 
     /**
-     *
+     * Define collection
      * @param alias
      * @param selectorOrComponent
+     * @param selectorType
+     * @param text
      */
-    defineCollection(alias, selectorOrComponent) {
+    defineCollection(alias, selectorOrComponent, selectorType, text) {
         if (selectorOrComponent.isComponent) {
             this.elements.set(alias, selectorOrComponent)
         } else if (typeof selectorOrComponent === "string") {
-            this.elements.set(alias, new Collection(alias, selectorOrComponent))
+            this.elements.set(alias, new Collection(alias, selectorOrComponent, selectorType, text))
         }
     }
 
@@ -86,16 +90,16 @@ class AbstractPage {
      * @private
      */
     _getElementOfCollection(currentProtractorElement, currentComponent, alias, index) {
-        const newElement = currentComponent.elements.get(alias);
+        const newComponent = currentComponent.elements.get(alias);
         if (currentProtractorElement) {
-            if (newElement.isCollection) {
-                return currentProtractorElement.all(by.css(newElement.selector)).get(index)
+            if (newComponent.isCollection) {
+                return currentProtractorElement.all(this._getSelector(newComponent)).get(index)
             } else {
                 throw new Error(`${alias} is not collection`)
             }
         } else {
-            if (newElement.isCollection) {
-                return element.all(by.css(newElement.selector)).get(index)
+            if (newComponent.isCollection) {
+                return element.all(this._getSelector(newComponent)).get(index)
             } else {
                 throw new Error(`${alias} is not collection`)
             }
@@ -111,28 +115,50 @@ class AbstractPage {
      * @private
      */
     _getElementOrCollection(currentProtractorElement, currentComponent, alias) {
-        const newElement = currentComponent.elements.get(alias);
+        const newComponent = currentComponent.elements.get(alias);
         if (currentProtractorElement) {
-            if (newElement.isCollection) {
-                return currentProtractorElement.all(by.css(newElement.selector))
+            if (newComponent.isCollection) {
+                return currentProtractorElement.all(this._getSelector(newComponent))
             } else {
                 if (currentProtractorElement.count) {
-                    return currentProtractorElement.all(by.css(newElement.selector))
+                    return currentProtractorElement.all(this._getSelector(newComponent))
                 } else {
-                    return currentProtractorElement.element(by.css(newElement.selector))
+                    return currentProtractorElement.element(this._getSelector(newComponent))
                 }
             }
         } else {
-            if (newElement.isCollection) {
-                return element.all(by.css(newElement.selector))
+            if (newComponent.isCollection) {
+                return element.all(this._getSelector(newComponent))
             } else {
-                return element(by.css(newElement.selector))
+                return element(this._getSelector(newComponent))
             }
         }
     }
 
     /**
-     *
+     * Resolve element by location strategy
+     * @param element {{selectorType, selector, text}}
+     * @return {By}
+     * @private
+     */
+    _getSelector(element) {
+        element.selectorType = element.selectorType || "css";
+        switch (element.selectorType) {
+            case "css": return by.css(element.selector); break;
+            case "xpath": return by.xpath(element.selector); break;
+            case "cssContainText": {
+                if (element.text) {
+                    return by.cssContainingText(element.selector, element.text)
+                } else {
+                    throw new Error("Text is not defined")
+                }
+            } break;
+            default: throw new Error(`Selector type ${element.selectorType} is not defined`);
+        }
+    }
+
+    /**
+     * Get component from component tree
      * @param currentComponent
      * @param token
      * @return {V}
@@ -144,7 +170,7 @@ class AbstractPage {
     }
 
     /**
-     *
+     * Parse token to index value and alias
      * @param token
      * @return {*}
      * @private
