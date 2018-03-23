@@ -18,11 +18,10 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     });
 
     gulp.task("test:prepare_folders", ["folders"], () => {
-        let promises = [];
-        const creds = envs[util.env.env].credentials;
-        promises.push(credentialManagerClass.createPool(creds));
-        promises.push(GulpHelpers.prepareFolders());
-        return Promise.all(promises);
+        return Promise.all([
+            credentialManagerClass.createPool(envs[util.env.env].credentials),
+            GulpHelpers.prepareFolders()
+        ]);
     });
 
     gulp.task("test:driver_update", ["test:prepare_folders"], webdriver_update({
@@ -69,7 +68,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     gulp.task("kill", () => TasksKiller.kill(["chromedriver", "iedriverserver"]));
 
     gulp.task("report", () => {
-        Reporter.generateHTMLReport(require(path.resolve("./e2e/protractor.conf.js")).config.capabilities.metadata);
+        Reporter.generateHTMLReport(require(path.resolve("./protractor.conf.js")).config.capabilities.metadata);
         Reporter.generateXMLReport("./test/report.json", "./test/report.xml");
     });
 
