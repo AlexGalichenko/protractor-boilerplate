@@ -146,7 +146,7 @@ class AbstractPage {
         switch (element.selectorType) {
             case "css": return by.css(element.selector); break;
             case "xpath": return by.xpath(element.selector); break;
-            case "cssContainText": {
+            case "cssContainingText": {
                 if (element.text) {
                     return by.cssContainingText(element.selector, element.text)
                 } else {
