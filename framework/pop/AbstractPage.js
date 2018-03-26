@@ -144,15 +144,15 @@ class AbstractPage {
     _getSelector(element) {
         element.selectorType = element.selectorType || "css";
         switch (element.selectorType) {
-            case "css": return by.css(element.selector); break;
-            case "xpath": return by.xpath(element.selector); break;
+            case "css": return by.css(element.selector);
+            case "xpath": return by.xpath(element.selector);
             case "cssContainingText": {
                 if (element.text) {
                     return by.cssContainingText(element.selector, element.text)
                 } else {
                     throw new Error("Text is not defined")
                 }
-            } break;
+            }
             default: throw new Error(`Selector type ${element.selectorType} is not defined`);
         }
     }
