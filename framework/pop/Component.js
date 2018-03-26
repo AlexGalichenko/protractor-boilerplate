@@ -7,8 +7,10 @@ class Component extends AbstractPage {
      * @param alias
      * @param selector
      * @param isCollection
+     * @param selectorType
+     * @param text
      */
-    constructor(alias, selector, isCollection) {
+    constructor(alias, selector, isCollection, selectorType = "css", text) {
         super();
 
         if (!alias) {
@@ -21,6 +23,8 @@ class Component extends AbstractPage {
 
         this.alias = alias;
         this.selector = selector;
+        this.selectorType = selectorType;
+        this.text = text;
         this.isComponent = true;
         this.isCollection = isCollection;
     }
