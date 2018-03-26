@@ -142,7 +142,6 @@ class AbstractPage {
      * @private
      */
     _getSelector(element) {
-        element.selectorType = element.selectorType || "css";
         switch (element.selectorType) {
             case "css": return by.css(element.selector);
             case "xpath": return by.xpath(element.selector);
