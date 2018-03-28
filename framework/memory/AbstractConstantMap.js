@@ -46,7 +46,7 @@ class AbstractConstantMap {
      * @return {String}
      */
     getConstant(key) {
-        if (!this.constants.hasOwnProperty(key)) {
+        if (!this.constants[key]) {
             throw new Error(`No such key: '${key}'`);
         }
         return this.constants[key];
