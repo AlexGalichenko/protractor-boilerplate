@@ -14,10 +14,10 @@ class AbstractConstantMap {
      * @param givenValue - value
      */
     defineConstant(key, givenValue) {
-        if (this.constants.hasOwnProperty(key)) {
+        if (this.constants[key]) {
             throw new Error(`Constant with such key: '${key}' is already created`);
         } else {
-            Object.defineProperty(this, key, {
+            Object.defineProperty(this.constants, key, {
                 value: givenValue,
                 writable: false
             });
@@ -30,7 +30,14 @@ class AbstractConstantMap {
      * @param path - path to file
      */
     defineFileConstant(key, path) {
-        this.fileConstants[key] = path;
+        if (this.fileConstants[key]) {
+            throw new Error(`Constant with such key: '${key}' is already created`);
+        } else {
+            Object.defineProperty(this.fileConstants, key, {
+                value: path,
+                writable: false
+            });
+        }
     }
 
     /**
