@@ -14,15 +14,13 @@ class AbstractConstantMap {
      * @param givenValue - value
      */
     defineConstant(key, givenValue) {
-        const onlyReadableObject = {};
         if (this.constants.hasOwnProperty(key)) {
             throw new Error(`Constant with such key: '${key}' is already created`);
         } else {
-            Object.defineProperty(onlyReadableObject, key, {
+            Object.defineProperty(this, key, {
                 value: givenValue,
                 writable: false
             });
-            this.constants[key] = onlyReadableObject;
         }
     }
 
