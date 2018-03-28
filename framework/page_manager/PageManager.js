@@ -4,7 +4,8 @@ class PageManager {
 
     /**
      * Returns function which automatically defines of current page
-     * @param pageMap - instance of PageMap;
+     * @param pageMap - instance of PageMap
+     * @return {Function} - current page
      */
     static getPage(pageMap) {
         return function () {
