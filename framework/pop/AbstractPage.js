@@ -90,7 +90,8 @@ class AbstractPage {
      * @private
      */
     _getElementOfCollection(currentProtractorElement, currentComponent, alias, index) {
-        const newComponent = currentComponent.elements.get(alias);
+        const newComponent = this._newComponentCreator(currentComponent, alias);
+
         if (currentProtractorElement) {
             if (newComponent.isCollection) {
                 return currentProtractorElement.all(this._getSelector(newComponent)).get(index)
@@ -115,7 +116,8 @@ class AbstractPage {
      * @private
      */
     _getElementOrCollection(currentProtractorElement, currentComponent, alias) {
-        const newComponent = currentComponent.elements.get(alias);
+        const newComponent = this._newComponentCreator(currentComponent, alias);
+
         if (currentProtractorElement) {
             if (newComponent.isCollection) {
                 return currentProtractorElement.all(this._getSelector(newComponent))
@@ -132,6 +134,28 @@ class AbstractPage {
             } else {
                 return element(this._getSelector(newComponent))
             }
+        }
+    }
+
+    /**
+     * Function for verifying and returning element
+     * @param currentComponent
+     * @param alias
+     * @returns {ProtractorElement|ProtractorCollection}
+     * @throws Error
+     * @private
+     */
+    _newComponentCreator(currentComponent, alias) {
+        try{
+            const newComponent = currentComponent.elements.get(alias);
+
+            if (!newComponent){
+                throw new Error();
+            }
+
+            return newComponent;
+        } catch (e){
+            throw new Error(`There is no such element: '${alias}'`) ;
         }
     }
 
