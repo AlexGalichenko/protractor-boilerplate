@@ -55,11 +55,11 @@ class AbstractConstantMap {
     /**
      * Get file constant value by key
      * @param key - key of file constant
-     * @return {String} - file content
+     * @return {String} - file content in utf8
      */
     getFileConstant(key) {
         if (this.fileConstants[key]) {
-            return fs.readFileSync(path.resolve(this.fileConstants[key]))
+            return fs.readFileSync(path.resolve(this.fileConstants[key]), "utf8")
         } else {
             throw new Error(`No such key: '${key}'`);
         }
