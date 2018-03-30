@@ -3,10 +3,9 @@ function parseArgv(argumentName, argv) {
     let arg = null;
     try {
         const [_, arg] = argv.join(" ").match(ARGV_REGEXP);
-        return arg
-    } catch(e) {
-        return arg
     }
+    catch(e) {}
+    return arg
 }
 
 module.exports = {
