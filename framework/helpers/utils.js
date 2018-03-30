@@ -1,8 +1,8 @@
 function parseArgv(argumentName, argv) {
-    const ARGV_REGEXP = new RegExp(`^.+--${argumentName}\\s(.+?)\\s*.*$`);
+    const ARGV_REGEXP = new RegExp(`^.+--${argumentName}\\s(.+?)(\\s.+$|$)`);
     let arg = null;
     try {
-        const [_, arg] = argv.join(" ").match(ARGV_REGEXP);
+        arg = argv.join(" ").match(ARGV_REGEXP)[1];
     }
     catch(e) {}
     return arg

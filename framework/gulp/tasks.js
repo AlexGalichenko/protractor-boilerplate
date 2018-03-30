@@ -73,6 +73,6 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     });
 
     gulp.task("c_server", () => {
-        server.run([__dirname + "/credential_server.js", "--credentialServerPort", util.env.credentialServerPort]);
+        server.run([__dirname + "/credential_server.js", "--credentialServerPort", util.env.credentialServerPort || 3099]);
     });
 };
