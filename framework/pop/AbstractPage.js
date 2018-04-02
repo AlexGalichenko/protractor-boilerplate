@@ -64,7 +64,7 @@ class AbstractPage {
     }
 
     /**
-     *
+     * Get protractor single element or collection of elements or element from collection
      * @param currentProtractorElement
      * @param currentComponent
      * @param token
@@ -75,13 +75,12 @@ class AbstractPage {
         const {index, alias, innerText} = this._parseToken(token);
         if (index !== null) {
             return this._getElementOfCollection(currentProtractorElement, currentComponent, alias, index, innerText)
-        } else {
-            return this._getElementOrCollection(currentProtractorElement, currentComponent, alias)
         }
+        return this._getElementOrCollection(currentProtractorElement, currentComponent, alias)
     }
 
     /**
-     * Get protractor element by index
+     * Get protractor element by index or text
      * @param currentProtractorElement
      * @param currentComponent
      * @param alias
@@ -97,9 +96,13 @@ class AbstractPage {
                 if (!innerText) {
                     return currentProtractorElement.all(this._getSelector(newComponent)).get(index)
                 } else {
-                    return currentProtractorElement.all(this._getSelector(newComponent)).filter(async (elem, index) => {
-                        return await elem.getText() === innerText;
-                    }).first();
+                    try {
+                        return currentProtractorElement.all(this._getSelector(newComponent)).filter(async (elem) => {
+                            return await elem.getText() === innerText;
+                        }).first();
+                    } catch (e) {
+                        throw new Error(`There is no elements with '${innerText}' text`);
+                    }
                 }
             } else {
                 throw new Error(`${alias} is not collection`)
@@ -109,9 +112,13 @@ class AbstractPage {
                 if (!innerText) {
                     return element.all(this._getSelector(newComponent)).get(index)
                 } else {
-                    return element.all(this._getSelector(newComponent)).filter(async (elem, index) => {
-                        return await elem.getText() === innerText;
-                    }).first();
+                    try {
+                        return element.all(this._getSelector(newComponent)).filter(async (elem) => {
+                            return await elem.getText() === innerText;
+                        }).first();
+                    } catch (e) {
+                        throw new Error(`There is no elements with '${innerText}' text`);
+                    }
                 }
             } else {
                 throw new Error(`${alias} is not collection`)
@@ -205,7 +212,7 @@ class AbstractPage {
     }
 
     /**
-     * Parse token to index value and alias
+     * Parse token to index or text value and alias
      * @param token
      * @return {*}
      * @private
@@ -214,20 +221,11 @@ class AbstractPage {
         const ELEMENT_OF_COLLECTION_REGEXP = /#(!\w{1,}|\$\w{1,}|\w{1,})\s+(in|of)\s+(.+)/;
         if (ELEMENT_OF_COLLECTION_REGEXP.test(token)) {
             const parsedTokens = token.match(ELEMENT_OF_COLLECTION_REGEXP);
-            const rememberedValue = this._memberValue(parsedTokens[1]);
-            if (parsedTokens[2] === "of") {
-                return {
-                    index: rememberedValue ? rememberedValue : parsedTokens[1] - 1,
-                    alias: parsedTokens[3],
-                    innerText: null
-                }
-            }
-            if (parsedTokens[2] === "in") {
-                return {
-                    index: 0,
-                    innerText: rememberedValue ? rememberedValue : parsedTokens[1] - 1,
-                    alias: parsedTokens[3]
-                }
+            const rememberedValue = this._getValueFromMemory(parsedTokens[1]);
+            return {
+                index: parsedTokens[2] === "of"? rememberedValue : 0,
+                innerText: parsedTokens[2] === "in" ? rememberedValue : null,
+                alias: parsedTokens[3]
             }
         } else return {
             index: null,
@@ -237,12 +235,12 @@ class AbstractPage {
     }
 
     /**
-     *
+     * Get value from memory or given value
      * @param value
      * @returns {*}
      * @private
      */
-    _memberValue(value) {
+    _getValueFromMemory(value) {
         let prefix = value.charAt(0);
         switch (prefix) {
             case "!": return Memory.parseValue(value);
@@ -250,7 +248,7 @@ class AbstractPage {
             default: try {
                 return Memory.parseValue(`#${value}`);
             } catch (e){
-                return value;
+                return value - 1;
             }
         }
     }
