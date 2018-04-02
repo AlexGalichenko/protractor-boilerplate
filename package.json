@@ -1,6 +1,6 @@
 {
   "name": "protractor-cucumber-boilerplate",
-  "version": "0.1.0",
+  "version": "0.2.2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AlexGalichenko/protractor-boilerplate.git"
@@ -12,7 +12,10 @@
   "bugs": {
     "url": "https://github.com/AlexGalichenko/protractor-boilerplate/issues"
   },
-  "authors": ["Alexander Galichenko", "Kirill Bogdanets"],
+  "authors": [
+    "Alexander Galichenko",
+    "Kirill Bogdanets"
+  ],
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.2",

@@ -72,9 +72,9 @@ class AbstractPage {
      * @private
      */
     _getProtractorElement(currentProtractorElement, currentComponent, token) {
-        const {index, alias} = this._parseToken(token);
+        const {index, alias, innerText} = this._parseToken(token);
         if (index !== null) {
-            return this._getElementOfCollection(currentProtractorElement, currentComponent, alias, index)
+            return this._getElementOfCollection(currentProtractorElement, currentComponent, alias, index, innerText)
         } else {
             return this._getElementOrCollection(currentProtractorElement, currentComponent, alias)
         }
@@ -89,18 +89,30 @@ class AbstractPage {
      * @return {ProtractorElement}
      * @private
      */
-    _getElementOfCollection(currentProtractorElement, currentComponent, alias, index) {
+    _getElementOfCollection(currentProtractorElement, currentComponent, alias, index, innerText) {
         const newComponent = this._newComponentCreator(currentComponent, alias);
 
         if (currentProtractorElement) {
             if (newComponent.isCollection) {
-                return currentProtractorElement.all(this._getSelector(newComponent)).get(index)
+                if (!innerText) {
+                    return currentProtractorElement.all(this._getSelector(newComponent)).get(index)
+                } else {
+                    return currentProtractorElement.all(this._getSelector(newComponent)).filter(async (elem, index) => {
+                        return await elem.getText() === innerText;
+                    }).first();
+                }
             } else {
                 throw new Error(`${alias} is not collection`)
             }
         } else {
             if (newComponent.isCollection) {
-                return element.all(this._getSelector(newComponent)).get(index)
+                if (!innerText) {
+                    return element.all(this._getSelector(newComponent)).get(index)
+                } else {
+                    return element.all(this._getSelector(newComponent)).filter(async (elem, index) => {
+                        return await elem.getText() === innerText;
+                    }).first();
+                }
             } else {
                 throw new Error(`${alias} is not collection`)
             }
@@ -199,16 +211,47 @@ class AbstractPage {
      * @private
      */
     _parseToken(token) {
-        const ELEMENT_OF_COLLECTION_REGEXP = /#(\d+)\s+of\s+(.+)/;
+        const ELEMENT_OF_COLLECTION_REGEXP = /#(!\w{1,}|\$\w{1,}|\w{1,})\s+(in|of)\s+(.+)/;
         if (ELEMENT_OF_COLLECTION_REGEXP.test(token)) {
             const parsedTokens = token.match(ELEMENT_OF_COLLECTION_REGEXP);
-            return {
-                index: parsedTokens[1] - 1,
-                alias: parsedTokens[2]
+            const rememberedValue = this._memberValue(parsedTokens[1]);
+            if (parsedTokens[2] === "of") {
+                return {
+                    index: rememberedValue ? rememberedValue : parsedTokens[1] - 1,
+                    alias: parsedTokens[3],
+                    innerText: null
+                }
+            }
+            if (parsedTokens[2] === "in") {
+                return {
+                    index: 0,
+                    innerText: rememberedValue ? rememberedValue : parsedTokens[1] - 1,
+                    alias: parsedTokens[3]
+                }
             }
         } else return {
             index: null,
-            alias: token
+            alias: token,
+            innerText: null
+        }
+    }
+
+    /**
+     *
+     * @param value
+     * @returns {*}
+     * @private
+     */
+    _memberValue(value) {
+        let prefix = value.charAt(0);
+        switch (prefix) {
+            case "!": return Memory.parseValue(value);
+            case "$": return Memory.parseValue(value);
+            default: try {
+                return Memory.parseValue(`#${value}`);
+            } catch (e){
+                return value;
+            }
         }
     }
 
