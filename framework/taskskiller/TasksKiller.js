@@ -1,4 +1,3 @@
-"use strict";
 const exec = require('child_process').exec;
 
 class TaskKiller {
@@ -11,26 +10,22 @@ class TaskKiller {
         const CMD_LIST = "tasklist /V /FO CSV";
         const KILL = "taskkill /F /PID ";
 
-        exec(CMD_LIST, (error, stdout, stderr) => {
-            if (error) throw error;
+        return new Promise((resolve, reject) => {
+            exec(CMD_LIST, (error, stdout) => {
+                if (error) reject(error);
 
-            const filteredList = stdout.split("\r\n").filter((process) => {
-                return itemToKill.find((item) => {
-                    return process.includes(item)
-                });
-            });
+                stdout
+                    .split("\r\n")
+                    .filter(process => itemToKill.find(item => process.includes(item)))
+                    .map(item => item.split(/,/)[1].replace(/"/g, ""))
+                    .forEach(pid => exec(KILL + pid, error => {
+                        if (error) reject(error);
+                        console.log("Process with id " + pid + " killed");
+                    }));
 
-            const pids = filteredList.map((item) => {
-                return item.split(/,/)[1].replace(/"/g, "")
-            });
-
-            pids.forEach((pid) => {
-                exec(KILL + pid, (error, stdout, stderr) => {
-                    if (error) throw error;
-                    console.log(stdout);
-                });
+                resolve();
             })
-        })
+        });
     }
 }
 

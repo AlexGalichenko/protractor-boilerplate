@@ -12,10 +12,7 @@
   "bugs": {
     "url": "https://github.com/AlexGalichenko/protractor-boilerplate/issues"
   },
-  "authors": [
-    "Alexander Galichenko",
-    "Kirill Bogdanets"
-  ],
+  "authors": ["Alexander Galichenko", "Kirill Bogdanets"],
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.2",

@@ -35,16 +35,15 @@ class Memory {
      * @throws {Error}
      */
     static parseValue(key) {
-        const MEMORY_REGEXP = /^(\$+|#|!)/g;
-
-        const prefix = key.match(MEMORY_REGEXP) ? key.match(MEMORY_REGEXP).pop() : "";
-        const parsedKey = key.replace(prefix, "");
+        const MEMORY_REGEXP = /^(\$|#|!|!!)?([^$#!].+)$/;
+        const [_, prefix, parsedKey] = key.match(MEMORY_REGEXP);
 
         switch (prefix) {
-            case "$": return this._getMemoryValue(parsedKey); break;
-            case "#": return this._getCalculableValue(parsedKey); break;
-            case "!": return this._getConstantValue(parsedKey); break;
-            case "": return parsedKey; break;
+            case "$": return this._getMemoryValue(parsedKey);
+            case "#": return this._getCalculableValue(parsedKey);
+            case "!": return this._getConstantValue(parsedKey);
+            case "!!": return this._getFileConstantValue(parsedKey);
+            case undefined: return parsedKey;
             default: throw new Error(`${parsedKey} is not defined`)
         }
 
@@ -86,6 +85,19 @@ class Memory {
     static _getConstantValue(key) {
         if (this.constantsInstance) {
             return this.constantsInstance.getConstant(key)
+        }
+        else throw new Error(`Instance of constant is not defined`)
+    }
+
+    /**
+     * Return file constant value
+     * @param key
+     * @return {*}
+     * @private
+     */
+    static _getFileConstantValue(key) {
+        if (this.constantsInstance) {
+            return this.constantsInstance.getFileConstant(key)
         }
         else throw new Error(`Instance of constant is not defined`)
     }
