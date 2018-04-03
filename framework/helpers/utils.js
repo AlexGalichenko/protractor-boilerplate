@@ -1,11 +1,12 @@
 function parseArgv(argumentName, argv) {
     const ARGV_REGEXP = new RegExp(`^.+--${argumentName}\\s(.+?)(\\s.+$|$)`);
-    let arg = null;
-    try {
-        arg = argv.join(" ").match(ARGV_REGEXP)[1];
+    const joinedArgv = argv.join(" ");
+
+    if (ARGV_REGEXP.test(joinedArgv)) {
+        return joinedArgv.match(ARGV_REGEXP)[1]
+    } else {
+        return null
     }
-    catch(e) {}
-    return arg
 }
 
 module.exports = {
