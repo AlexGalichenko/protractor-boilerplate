@@ -2,7 +2,7 @@ const gulp = require("gulp");
 const path = require("path");
 const util = require("gulp-util");
 const clean = require("gulp-clean");
-const protractor = require("gulp-angular-protractor");
+const {protractor, webdriver_update_specific} = require("gulp-protractor");
 const server = require("gulp-express");
 const {prepareFolders, parseGulpArgs} = require("../helpers/utils");
 const Reporter = require("../../framework/reporter/Reporter");
@@ -22,15 +22,16 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         ]);
     });
 
-    gulp.task("test", ["c_server"], () => {
+    gulp.task("test:driver_update", ["test:prepare_folders"], webdriver_update_specific({
+        webdriverManagerArgs: ["--ie32", "--chrome"]
+    }));
+
+    gulp.task("test", ["test:driver_update", "c_server"], () => {
         gulp.src([])
             .pipe(protractor({
-                configFile: "./protractor.conf.js",
+                configFile: path.resolve("./protractor.conf.js"),
                 args: parseGulpArgs(util.env),
                 autoStartStopServer: true,
-                webDriverUpdate: {
-                    browsers: ["chrome", "ie"]
-                }
             }))
             .on("end", function () {
                 console.log("E2E Testing complete");
