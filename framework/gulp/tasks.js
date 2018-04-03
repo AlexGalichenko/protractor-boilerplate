@@ -22,10 +22,10 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         ]);
     });
 
-    gulp.task("test", ["test:driver_update", "c_server"], () => {
+    gulp.task("test", ["c_server"], () => {
         gulp.src([])
             .pipe(protractor({
-                configFile: path.resolve("./protractor.conf.js"),
+                configFile: "./protractor.conf.js",
                 args: parseGulpArgs(util.env),
                 autoStartStopServer: true,
                 webDriverUpdate: {
