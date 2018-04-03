@@ -11,7 +11,7 @@ const TasksKiller = require("../../framework/taskskiller/TasksKiller");
 const server = require("gulp-express");
 const CredentialManager = require("../credential_manager/ServerCredentialManager");
 
-module.exports = function (gulp, envs, credentialManagerClass = CredentialManager, serverPath = path.resolve("./credential_server.js")) {
+module.exports = function (gulp, envs, credentialManagerClass = CredentialManager) {
     gulp.task("folders", () => {
         return gulp.src("test", {read: false})
             .pipe(clean());
@@ -25,7 +25,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     });
 
     gulp.task("test:driver_update", ["test:prepare_folders"], webdriver_update({
-        browsers: ["chrome", "ie"]
+        webdriverManagerArgs: ["--ie32", "--chrome"]
     }));
 
     gulp.task("webdriver_server", ["test:driver_update"], gp.webdriver_standalone);
@@ -73,6 +73,6 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     });
 
     gulp.task("c_server", () => {
-        server.run([serverPath]);
+        server.run([__dirname + "/credential_server.js", "--credentialServerPort", util.env.credentialServerPort || 3099]);
     });
 };

@@ -24,7 +24,9 @@ class Configurator {
         Memory.setConstantsInstance(this.constantMap);
 
         return {
-            State, Memory, CredentialManager
+            State,
+            Memory,
+            CredentialManager,
         }
     }
 
