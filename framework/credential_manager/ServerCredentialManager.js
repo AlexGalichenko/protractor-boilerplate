@@ -1,7 +1,9 @@
-"use strict";
-
+const utils = require("../helpers/utils");
+const path = require("path");
 const request = require("request-promise");
 const CredentialManager = require("./CredentialManager");
+const {credentialServerPort} = require(path.resolve("./framework.config"));
+const credentialServerPort = utils.parseArgv("credentialServerPort", process.argv) || 3099;
 
 /**
  * @implements {CredentialManager}
@@ -15,11 +17,10 @@ class ServerCredentialManager extends CredentialManager {
     static createPool(creds) {
         return request({
             method: "POST",
-            uri: "http://localhost:3099/credentials",
+            uri: "http://localhost:" + credentialServerPort + "/credentials",
             body: creds,
             json: true
         }).catch(e => {
-            //console.log(e);
             throw new Error("Credential pool has not been created")
         })
     }
@@ -30,11 +31,10 @@ class ServerCredentialManager extends CredentialManager {
     static getCredentials() {
         this.credentials = request({
             method: "GET",
-            uri: "http://localhost:3099/credentials",
+            uri: "http://localhost:" + credentialServerPort + "/credentials",
         }).then((body) => {
             return JSON.parse(body)
         }).catch(e => {
-            //console.log(e);
             throw new Error("Cannot get credentials")
         })
     }
@@ -46,14 +46,13 @@ class ServerCredentialManager extends CredentialManager {
         return this.credentials.then(credentials => {
             return request({
                 method: "PUT",
-                uri: "http://localhost:3099/credentials",
+                uri: "http://localhost:" + credentialServerPort + "/credentials",
                 body: {
                     username: credentials.username
                 },
                 json: true
             })
         }).catch(e => {
-            //console.log(e);
             throw new Error("Cannot free credentials")
         })
     }
