@@ -64,7 +64,7 @@ class AbstractPage {
     }
 
     /**
-     *
+     * Get protractor single element or collection of elements or element from collection
      * @param currentProtractorElement
      * @param currentComponent
      * @param token
@@ -72,16 +72,15 @@ class AbstractPage {
      * @private
      */
     _getProtractorElement(currentProtractorElement, currentComponent, token) {
-        const {index, alias} = this._parseToken(token);
+        const {index, alias, innerText} = this._parseToken(token);
         if (index !== null) {
-            return this._getElementOfCollection(currentProtractorElement, currentComponent, alias, index)
-        } else {
-            return this._getElementOrCollection(currentProtractorElement, currentComponent, alias)
+            return this._getElementOfCollection(currentProtractorElement, currentComponent, alias, index, innerText)
         }
+        return this._getElementOrCollection(currentProtractorElement, currentComponent, alias)
     }
 
     /**
-     * Get protractor element by index
+     * Get protractor element by index or text
      * @param currentProtractorElement
      * @param currentComponent
      * @param alias
@@ -89,18 +88,38 @@ class AbstractPage {
      * @return {ProtractorElement}
      * @private
      */
-    _getElementOfCollection(currentProtractorElement, currentComponent, alias, index) {
+    _getElementOfCollection(currentProtractorElement, currentComponent, alias, index, innerText) {
         const newComponent = this._newComponentCreator(currentComponent, alias);
 
         if (currentProtractorElement) {
             if (newComponent.isCollection) {
-                return currentProtractorElement.all(this._getSelector(newComponent)).get(index)
+                if (!innerText) {
+                    return currentProtractorElement.all(this._getSelector(newComponent)).get(index)
+                } else {
+                    try {
+                        return currentProtractorElement.all(this._getSelector(newComponent)).filter(async (elem) => {
+                            return await elem.getText() === innerText;
+                        }).first();
+                    } catch (e) {
+                        throw new Error(`There is no elements with '${innerText}' text`);
+                    }
+                }
             } else {
                 throw new Error(`${alias} is not collection`)
             }
         } else {
             if (newComponent.isCollection) {
-                return element.all(this._getSelector(newComponent)).get(index)
+                if (!innerText) {
+                    return element.all(this._getSelector(newComponent)).get(index)
+                } else {
+                    try {
+                        return element.all(this._getSelector(newComponent)).filter(async (elem) => {
+                            return await elem.getText() === innerText;
+                        }).first();
+                    } catch (e) {
+                        throw new Error(`There is no elements with '${innerText}' text`);
+                    }
+                }
             } else {
                 throw new Error(`${alias} is not collection`)
             }
@@ -193,22 +212,44 @@ class AbstractPage {
     }
 
     /**
-     * Parse token to index value and alias
+     * Parse token to index or text value and alias
      * @param token
      * @return {*}
      * @private
      */
     _parseToken(token) {
-        const ELEMENT_OF_COLLECTION_REGEXP = /#(\d+)\s+of\s+(.+)/;
+        const ELEMENT_OF_COLLECTION_REGEXP = /#([!\$]?\w+)\s+(in|of)\s+(.+)/;
         if (ELEMENT_OF_COLLECTION_REGEXP.test(token)) {
             const parsedTokens = token.match(ELEMENT_OF_COLLECTION_REGEXP);
+            const rememberedValue = this._getValueFromMemory(parsedTokens[1]);
             return {
-                index: parsedTokens[1] - 1,
-                alias: parsedTokens[2]
+                index: parsedTokens[2] === "of"? rememberedValue : 0,
+                innerText: parsedTokens[2] === "in" ? rememberedValue : null,
+                alias: parsedTokens[3]
             }
         } else return {
             index: null,
-            alias: token
+            alias: token,
+            innerText: null
+        }
+    }
+
+    /**
+     * Get value from memory or given value
+     * @param value
+     * @returns {*}
+     * @private
+     */
+    _getValueFromMemory(value) {
+        let prefix = value.charAt(0);
+        switch (prefix) {
+            case "!": return Memory.parseValue(value);
+            case "$": return Memory.parseValue(value);
+            default: try {
+                return Memory.parseValue(`#${value}`);
+            } catch (e){
+                return value - 1;
+            }
         }
     }
 
