@@ -2,13 +2,11 @@ const gulp = require("gulp");
 const path = require("path");
 const util = require("gulp-util");
 const clean = require("gulp-clean");
-const protractor = require("gulp-protractor").protractor;
-const gp = require("gulp-protractor");
-const GulpHelpers = require("../helpers/GulpHelpers");
-const webdriver_update = require("gulp-protractor").webdriver_update_specific;
+const {protractor, webdriver_update_specific} = require("gulp-protractor");
+const server = require("gulp-express");
+const {prepareFolders, parseGulpArgs} = require("../helpers/utils");
 const Reporter = require("../../framework/reporter/Reporter");
 const TasksKiller = require("../../framework/taskskiller/TasksKiller");
-const server = require("gulp-express");
 const CredentialManager = require("../credential_manager/ServerCredentialManager");
 
 module.exports = function (gulp, envs, credentialManagerClass = CredentialManager) {
@@ -20,40 +18,20 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     gulp.task("test:prepare_folders", ["folders"], () => {
         return Promise.all([
             credentialManagerClass.createPool(envs[util.env.env].credentials),
-            GulpHelpers.prepareFolders()
+            prepareFolders()
         ]);
     });
 
-    gulp.task("test:driver_update", ["test:prepare_folders"], webdriver_update({
+    gulp.task("test:driver_update", ["test:prepare_folders"], webdriver_update_specific({
         webdriverManagerArgs: ["--ie32", "--chrome"]
     }));
 
-    gulp.task("webdriver_server", ["test:driver_update"], gp.webdriver_standalone);
-
     gulp.task("test", ["test:driver_update", "c_server"], () => {
-
-        const args = [
-            "--params.environment", util.env.env,
-            "--cucumberOpts.tags", util.env.tags,
-            "--capabilities.browserName", util.env.browser || "chrome",
-        ];
-
-        if (util.env.instances > 1) {
-            args.push("--capabilities.shardTestFiles");
-            args.push("--capabilities.maxInstances");
-            args.push(util.env.instances)
-        }
-
-        if (util.env.baseUrl) {
-            args.push("--params.baseUrl");
-            args.push(util.env.baseUrl);
-        }
-
         gulp.src([])
             .pipe(protractor({
                 configFile: path.resolve("./protractor.conf.js"),
-                args: args,
-                autoStartStopServer: true
+                args: parseGulpArgs(util.env),
+                autoStartStopServer: true,
             }))
             .on("end", function () {
                 console.log("E2E Testing complete");

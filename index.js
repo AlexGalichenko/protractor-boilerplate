@@ -11,7 +11,6 @@ exports.AbstractCalculablesMap = require('./framework/memory/AbstractCalculables
 exports.CredentialServer = require('./framework/credential_server/CredentialServer');
 exports.ServerCredentialManager = require('./framework/credential_manager/ServerCredentialManager');
 exports.Reporter = require('./framework/reporter/Reporter');
-exports.GulpHelpers = require('./framework/helpers/GulpHelpers');
 exports.AbstractPageMap = require('./framework/page_manager/AbstractPageMap');
 exports.PageManager = require('./framework/page_manager/PageManager');
 exports.Configurator = require('./framework/configurator/Configurator');

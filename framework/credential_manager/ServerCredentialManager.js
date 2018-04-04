@@ -2,7 +2,6 @@ const utils = require("../helpers/utils");
 const path = require("path");
 const request = require("request-promise");
 const CredentialManager = require("./CredentialManager");
-const {credentialServerPort} = require(path.resolve("./framework.config"));
 const credentialServerPort = utils.parseArgv("credentialServerPort", process.argv) || 3099;
 
 /**
