@@ -35,7 +35,7 @@ class Memory {
      * @throws {Error}
      */
     static parseValue(key) {
-        const MEMORY_REGEXP = /^(\$|#|!|!!)?([^$#!].+)$/;
+        const MEMORY_REGEXP = /^(\$|#|!|!!)?([^$#!]?.+)$/;
         const [_, prefix, parsedKey] = key.match(MEMORY_REGEXP);
 
         switch (prefix) {
