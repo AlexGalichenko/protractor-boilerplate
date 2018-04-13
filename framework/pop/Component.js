@@ -25,7 +25,6 @@ class Component extends AbstractPage {
         this.selector = selector;
         this.selectorType = selectorType;
         this.text = text;
-        this.isComponent = true;
         this.isCollection = isCollection;
     }
 

@@ -20,7 +20,6 @@ class Element {
         this.selector = selector;
         this.selectorType = selectorType;
         this.text = text;
-        this.isComponent = false;
         this.isCollection = false;
     }
 

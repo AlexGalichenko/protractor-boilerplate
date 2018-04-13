@@ -1,4 +1,6 @@
-class Collection {
+const Element = require("./Element");
+
+class Collection extends Element {
 
     /**
      * Constructor of collection
@@ -8,19 +10,7 @@ class Collection {
      * @param text
      */
     constructor(alias, selector, selectorType = "css", text) {
-        if (!alias) {
-            throw new Error(`Alias of ${this.constructor.name} is not defined`)
-        }
-
-        if (!selector) {
-            throw new Error(`Selector of ${this.constructor.name} is not defined`)
-        }
-
-        this.alias = alias;
-        this.selector = selector;
-        this.selectorType = selectorType;
-        this.text = text;
-        this.isComponent = false;
+        super(alias, selector, selectorType, text);
         this.isCollection = true;
     }
 

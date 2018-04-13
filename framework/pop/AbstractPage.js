@@ -1,3 +1,4 @@
+const Memory = require("../memory/Memory");
 const Element = require("./Element");
 const Collection = require("./Collection");
 
@@ -21,20 +22,16 @@ class AbstractPage {
     /**
      * Define collection
      * @param alias
-     * @param selectorOrComponent
+     * @param selector
      * @param selectorType
      * @param text
      */
-    defineCollection(alias, selectorOrComponent, selectorType, text) {
-        if (selectorOrComponent.isComponent) {
-            this.elements.set(alias, selectorOrComponent)
-        } else if (typeof selectorOrComponent === "string") {
-            this.elements.set(alias, new Collection(alias, selectorOrComponent, selectorType, text))
-        }
+    defineCollection(alias, selector, selectorType, text) {
+        this.elements.set(alias, new Collection(alias, selector, selectorType, text))
     }
 
     /**
-     *
+     * Define component
      * @param alias
      * @param component
      */
@@ -43,8 +40,9 @@ class AbstractPage {
     }
 
     /**
+     * Get element by key
      * @param key
-     * @return {*}
+     * @return {ProtractorElement|ProtractorCollection}
      */
     getElement(key) {
         const tokens = key.split(/\s*>\s*/);
@@ -85,6 +83,7 @@ class AbstractPage {
      * @param currentComponent
      * @param alias
      * @param index
+     * @param innerText
      * @return {ProtractorElement}
      * @private
      */
@@ -97,9 +96,10 @@ class AbstractPage {
                     return currentProtractorElement.all(this._getSelector(newComponent)).get(index)
                 } else {
                     try {
-                        return currentProtractorElement.all(this._getSelector(newComponent)).filter(async (elem) => {
-                            return await elem.getText() === innerText;
-                        }).first();
+                        return currentProtractorElement
+                            .all(this._getSelector(newComponent))
+                            .filter(elem => elem.getText() === innerText)
+                            .first();
                     } catch (e) {
                         throw new Error(`There is no elements with '${innerText}' text`);
                     }
@@ -113,9 +113,10 @@ class AbstractPage {
                     return element.all(this._getSelector(newComponent)).get(index)
                 } else {
                     try {
-                        return element.all(this._getSelector(newComponent)).filter(async (elem) => {
-                            return await elem.getText() === innerText;
-                        }).first();
+                        return element
+                            .all(this._getSelector(newComponent))
+                            .filter(elem => elem.getText() === innerText)
+                            .first();
                     } catch (e) {
                         throw new Error(`There is no elements with '${innerText}' text`);
                     }
@@ -165,16 +166,10 @@ class AbstractPage {
      * @private
      */
     _newComponentCreator(currentComponent, alias) {
-        try{
-            const newComponent = currentComponent.elements.get(alias);
-
-            if (!newComponent){
-                throw new Error();
-            }
-
-            return newComponent;
-        } catch (e){
-            throw new Error(`There is no such element: '${alias}'`) ;
+        if (currentComponent.elements.has(alias)) {
+            return currentComponent.elements.get(alias)
+        } else {
+            throw new Error(`There is no such element: '${alias}'`)
         }
     }
 
@@ -223,7 +218,7 @@ class AbstractPage {
             const parsedTokens = token.match(ELEMENT_OF_COLLECTION_REGEXP);
             const rememberedValue = this._getValueFromMemory(parsedTokens[1]);
             return {
-                index: parsedTokens[2] === "of"? rememberedValue : 0,
+                index: parsedTokens[2] === "of" ? rememberedValue : 0,
                 innerText: parsedTokens[2] === "in" ? rememberedValue : null,
                 alias: parsedTokens[3]
             }

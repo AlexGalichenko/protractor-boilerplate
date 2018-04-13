@@ -1,5 +1,3 @@
-"use strict";
-
 class PageManager {
 
     /**
@@ -11,9 +9,7 @@ class PageManager {
         return function () {
             return browser.getCurrentUrl().then(currentUrl => {
                 let pageDefinitions = pageMap.pages;
-                return pageDefinitions.find(pageDefinition => {
-                    return new RegExp(pageDefinition.selector).test(currentUrl);
-                });
+                return pageDefinitions.find(pageDefinition => new RegExp(pageDefinition.selector).test(currentUrl));
             });
         }
     }
