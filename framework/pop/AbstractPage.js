@@ -89,14 +89,14 @@ class AbstractPage {
      */
     _getElementOfCollection(currentProtractorElement, currentComponent, alias, index, innerText) {
         const newComponent = this._newComponentCreator(currentComponent, alias);
+        const rootElement = currentProtractorElement ? currentProtractorElement : element(by.css("body"));
 
-        if (currentProtractorElement) {
-            if (newComponent.isCollection) {
+        if (newComponent.isCollection) {
                 if (!innerText) {
-                    return currentProtractorElement.all(this._getSelector(newComponent)).get(index)
+                    return rootElement.all(this._getSelector(newComponent)).get(index)
                 } else {
                     try {
-                        return currentProtractorElement
+                        return rootElement
                             .all(this._getSelector(newComponent))
                             .filter(elem => elem.getText() === innerText)
                             .first();
@@ -107,24 +107,42 @@ class AbstractPage {
             } else {
                 throw new Error(`${alias} is not collection`)
             }
-        } else {
-            if (newComponent.isCollection) {
-                if (!innerText) {
-                    return element.all(this._getSelector(newComponent)).get(index)
-                } else {
-                    try {
-                        return element
-                            .all(this._getSelector(newComponent))
-                            .filter(elem => elem.getText() === innerText)
-                            .first();
-                    } catch (e) {
-                        throw new Error(`There is no elements with '${innerText}' text`);
-                    }
-                }
-            } else {
-                throw new Error(`${alias} is not collection`)
-            }
-        }
+
+        // if (currentProtractorElement) {
+        //     if (newComponent.isCollection) {
+        //         if (!innerText) {
+        //             return currentProtractorElement.all(this._getSelector(newComponent)).get(index)
+        //         } else {
+        //             try {
+        //                 return currentProtractorElement
+        //                     .all(this._getSelector(newComponent))
+        //                     .filter(elem => elem.getText() === innerText)
+        //                     .first();
+        //             } catch (e) {
+        //                 throw new Error(`There is no elements with '${innerText}' text`);
+        //             }
+        //         }
+        //     } else {
+        //         throw new Error(`${alias} is not collection`)
+        //     }
+        // } else {
+        //     if (newComponent.isCollection) {
+        //         if (!innerText) {
+        //             return element.all(this._getSelector(newComponent)).get(index)
+        //         } else {
+        //             try {
+        //                 return element
+        //                     .all(this._getSelector(newComponent))
+        //                     .filter(elem => elem.getText() === innerText)
+        //                     .first();
+        //             } catch (e) {
+        //                 throw new Error(`There is no elements with '${innerText}' text`);
+        //             }
+        //         }
+        //     } else {
+        //         throw new Error(`${alias} is not collection`)
+        //     }
+        // }
     }
 
     /**
@@ -137,24 +155,31 @@ class AbstractPage {
      */
     _getElementOrCollection(currentProtractorElement, currentComponent, alias) {
         const newComponent = this._newComponentCreator(currentComponent, alias);
+        const rootElement = currentProtractorElement ? currentProtractorElement : element(by.css("body"));
 
-        if (currentProtractorElement) {
-            if (newComponent.isCollection) {
-                return currentProtractorElement.all(this._getSelector(newComponent))
-            } else {
-                if (currentProtractorElement.count) {
-                    return currentProtractorElement.all(this._getSelector(newComponent))
-                } else {
-                    return currentProtractorElement.element(this._getSelector(newComponent))
-                }
-            }
+        if (newComponent.isCollection || rootElement.count) {
+            return rootElement.all(this._getSelector(newComponent))
         } else {
-            if (newComponent.isCollection) {
-                return element.all(this._getSelector(newComponent))
-            } else {
-                return element(this._getSelector(newComponent))
-            }
+            return rootElement.element(this._getSelector(newComponent))
         }
+
+        // if (currentProtractorElement) {
+        //     if (newComponent.isCollection) {
+        //         return currentProtractorElement.all(this._getSelector(newComponent))
+        //     } else {
+        //         if (currentProtractorElement.count) {
+        //             return currentProtractorElement.all(this._getSelector(newComponent))
+        //         } else {
+        //             return currentProtractorElement.element(this._getSelector(newComponent))
+        //         }
+        //     }
+        // } else {
+        //     if (newComponent.isCollection) {
+        //         return element.all(this._getSelector(newComponent))
+        //     } else {
+        //         return element(this._getSelector(newComponent))
+        //     }
+        // }
     }
 
     /**
