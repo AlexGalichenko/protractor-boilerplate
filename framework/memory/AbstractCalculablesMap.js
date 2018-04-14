@@ -47,7 +47,7 @@ class AbstractCalculablesMap {
      * Assign map to memory
      */
     init() {
-        Memory.setConstantsInstance(this);
+        Memory.setCalculablesInstance(this);
     }
 
 }

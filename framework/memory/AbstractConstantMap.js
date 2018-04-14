@@ -70,7 +70,7 @@ class AbstractConstantMap {
      * Assign map to memory
      */
     init() {
-        Memory.setCalculablesInstance(this);
+        Memory.setConstantsInstance(this);
     }
 
 }
