@@ -12,6 +12,4 @@ exports.CredentialServer = require('./framework/credential_server/CredentialServ
 exports.ServerCredentialManager = require('./framework/credential_manager/ServerCredentialManager');
 exports.Reporter = require('./framework/reporter/Reporter');
 exports.AbstractPageMap = require('./framework/page_manager/AbstractPageMap');
-exports.PageManager = require('./framework/page_manager/PageManager');
-exports.Configurator = require('./framework/configurator/Configurator');
 exports.tasks = require('./framework/gulp/tasks');

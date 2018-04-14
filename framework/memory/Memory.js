@@ -1,11 +1,9 @@
-"use strict";
-
 class Memory {
 
     /**
      * @param calculablesInstance - instance of calculables map
      */
-    static setCalculables(calculablesInstance) {
+    static setCalculablesInstance(calculablesInstance) {
         this.calculablesInstance = calculablesInstance;
     }
     /**
@@ -35,7 +33,7 @@ class Memory {
      * @throws {Error}
      */
     static parseValue(key) {
-        const MEMORY_REGEXP = /^(\$|#|!|!!)?([^$#!]?.+)$/;
+        const MEMORY_REGEXP = /^(\$|#|!{1,2})?([^$#!]?.+)$/;
         const [_, prefix, parsedKey] = key.match(MEMORY_REGEXP);
 
         switch (prefix) {
@@ -56,7 +54,7 @@ class Memory {
      * @private
      */
     static _getMemoryValue(alias) {
-        if (this.memory[alias]) {
+        if (this.memory[alias] !== undefined) {
             return this.memory[alias];
         } else {
             throw new Error(`Value ${alias} doesn't exist in memory`)

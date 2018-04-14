@@ -64,15 +64,14 @@ class Reporter {
                     const REPORT_REGEXP = /^report\.\d+\.json$/;
                     const reports = files.filter(item => REPORT_REGEXP.test(item));
 
-                    const fullReport = reports.map(item => {
-                        return require(path.resolve(dirPath + item))
-                    }).reduce((prev, curr) => {
-                        if (curr.length > 0) {
-                            prev.push(curr[0]);
-                        }
-                        return prev
-                    }, []);
-
+                    const fullReport = reports
+                        .map(item => require(path.resolve(dirPath + item)))
+                        .reduce((prev, curr) => {
+                            if (curr.length > 0) {
+                                prev.push(curr[0]);
+                            }
+                            return prev
+                        }, []);
                     cb(JSON.stringify(fullReport))
                 })
             } else {

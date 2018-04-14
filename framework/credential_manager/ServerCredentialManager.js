@@ -19,7 +19,8 @@ class ServerCredentialManager extends CredentialManager {
             uri: "http://localhost:" + credentialServerPort + "/credentials",
             body: creds,
             json: true
-        }).catch(e => {
+        })
+        .catch(e => {
             throw new Error("Credential pool has not been created")
         })
     }
@@ -31,9 +32,9 @@ class ServerCredentialManager extends CredentialManager {
         this.credentials = request({
             method: "GET",
             uri: "http://localhost:" + credentialServerPort + "/credentials",
-        }).then((body) => {
-            return JSON.parse(body)
-        }).catch(e => {
+        })
+        .then((body) => JSON.parse(body))
+        .catch(e => {
             throw new Error("Cannot get credentials")
         })
     }

@@ -1,3 +1,4 @@
+const Memory = require("../memory/Memory");
 const Element = require("./Element");
 const Collection = require("./Collection");
 
@@ -21,20 +22,16 @@ class AbstractPage {
     /**
      * Define collection
      * @param alias
-     * @param selectorOrComponent
+     * @param selector
      * @param selectorType
      * @param text
      */
-    defineCollection(alias, selectorOrComponent, selectorType, text) {
-        if (selectorOrComponent.isComponent) {
-            this.elements.set(alias, selectorOrComponent)
-        } else if (typeof selectorOrComponent === "string") {
-            this.elements.set(alias, new Collection(alias, selectorOrComponent, selectorType, text))
-        }
+    defineCollection(alias, selector, selectorType, text) {
+        this.elements.set(alias, new Collection(alias, selector, selectorType, text))
     }
 
     /**
-     *
+     * Define component
      * @param alias
      * @param component
      */
@@ -43,8 +40,9 @@ class AbstractPage {
     }
 
     /**
+     * Get element by key
      * @param key
-     * @return {*}
+     * @return {ProtractorElement|ProtractorCollection}
      */
     getElement(key) {
         const tokens = key.split(/\s*>\s*/);
@@ -85,21 +83,23 @@ class AbstractPage {
      * @param currentComponent
      * @param alias
      * @param index
+     * @param innerText
      * @return {ProtractorElement}
      * @private
      */
     _getElementOfCollection(currentProtractorElement, currentComponent, alias, index, innerText) {
         const newComponent = this._newComponentCreator(currentComponent, alias);
+        const rootElement = currentProtractorElement ? currentProtractorElement : element(by.css("body"));
 
-        if (currentProtractorElement) {
-            if (newComponent.isCollection) {
+        if (newComponent.isCollection) {
                 if (!innerText) {
-                    return currentProtractorElement.all(this._getSelector(newComponent)).get(index)
+                    return rootElement.all(this._getSelector(newComponent)).get(index)
                 } else {
                     try {
-                        return currentProtractorElement.all(this._getSelector(newComponent)).filter(async (elem) => {
-                            return await elem.getText() === innerText;
-                        }).first();
+                        return rootElement
+                            .all(this._getSelector(newComponent))
+                            .filter(elem => elem.getText() === innerText)
+                            .first();
                     } catch (e) {
                         throw new Error(`There is no elements with '${innerText}' text`);
                     }
@@ -107,23 +107,6 @@ class AbstractPage {
             } else {
                 throw new Error(`${alias} is not collection`)
             }
-        } else {
-            if (newComponent.isCollection) {
-                if (!innerText) {
-                    return element.all(this._getSelector(newComponent)).get(index)
-                } else {
-                    try {
-                        return element.all(this._getSelector(newComponent)).filter(async (elem) => {
-                            return await elem.getText() === innerText;
-                        }).first();
-                    } catch (e) {
-                        throw new Error(`There is no elements with '${innerText}' text`);
-                    }
-                }
-            } else {
-                throw new Error(`${alias} is not collection`)
-            }
-        }
     }
 
     /**
@@ -136,23 +119,12 @@ class AbstractPage {
      */
     _getElementOrCollection(currentProtractorElement, currentComponent, alias) {
         const newComponent = this._newComponentCreator(currentComponent, alias);
+        const rootElement = currentProtractorElement ? currentProtractorElement : element(by.css("body"));
 
-        if (currentProtractorElement) {
-            if (newComponent.isCollection) {
-                return currentProtractorElement.all(this._getSelector(newComponent))
-            } else {
-                if (currentProtractorElement.count) {
-                    return currentProtractorElement.all(this._getSelector(newComponent))
-                } else {
-                    return currentProtractorElement.element(this._getSelector(newComponent))
-                }
-            }
+        if (newComponent.isCollection || rootElement.count) {
+            return rootElement.all(this._getSelector(newComponent))
         } else {
-            if (newComponent.isCollection) {
-                return element.all(this._getSelector(newComponent))
-            } else {
-                return element(this._getSelector(newComponent))
-            }
+            return rootElement.element(this._getSelector(newComponent))
         }
     }
 
@@ -165,16 +137,10 @@ class AbstractPage {
      * @private
      */
     _newComponentCreator(currentComponent, alias) {
-        try{
-            const newComponent = currentComponent.elements.get(alias);
-
-            if (!newComponent){
-                throw new Error();
-            }
-
-            return newComponent;
-        } catch (e){
-            throw new Error(`There is no such element: '${alias}'`) ;
+        if (currentComponent.elements.has(alias)) {
+            return currentComponent.elements.get(alias)
+        } else {
+            throw new Error(`There is no such element: '${alias}'`)
         }
     }
 
@@ -218,12 +184,12 @@ class AbstractPage {
      * @private
      */
     _parseToken(token) {
-        const ELEMENT_OF_COLLECTION_REGEXP = /#([!\$]?\w+)\s+(in|of)\s+(.+)/;
+        const ELEMENT_OF_COLLECTION_REGEXP = /#([!\$]?.+)\s+(in|of)\s+(.+)/;
         if (ELEMENT_OF_COLLECTION_REGEXP.test(token)) {
             const parsedTokens = token.match(ELEMENT_OF_COLLECTION_REGEXP);
             const rememberedValue = this._getValueFromMemory(parsedTokens[1]);
             return {
-                index: parsedTokens[2] === "of"? rememberedValue : 0,
+                index: parsedTokens[2] === "of" ? rememberedValue : 0,
                 innerText: parsedTokens[2] === "in" ? rememberedValue : null,
                 alias: parsedTokens[3]
             }

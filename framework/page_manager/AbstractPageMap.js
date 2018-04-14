@@ -1,4 +1,4 @@
-"use strict";
+const State = require("../state/State");
 
 /**
  * @abstract
@@ -34,6 +34,10 @@ class AbstractPageMap {
         } else {
             throw new Error(`${alias} page is not defined`)
         }
+    }
+
+    init() {
+        State.setPageMap(this);
     }
 
 }

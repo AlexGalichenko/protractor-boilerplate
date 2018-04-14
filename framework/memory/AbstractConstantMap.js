@@ -1,3 +1,4 @@
+const Memory = require("./Memory");
 const path = require("path");
 const fs = require("fs");
 
@@ -14,7 +15,7 @@ class AbstractConstantMap {
      * @param givenValue - value
      */
     defineConstant(key, givenValue) {
-        if (this.constants[key]) {
+        if (this.constants[key] !== undefined) {
             throw new Error(`Constant with such key: '${key}' is already created`);
         } else {
             Object.defineProperty(this.constants, key, {
@@ -30,7 +31,7 @@ class AbstractConstantMap {
      * @param path - path to file
      */
     defineFileConstant(key, path) {
-        if (this.fileConstants[key]) {
+        if (this.fileConstants[key] !== undefined) {
             throw new Error(`Constant with such key: '${key}' is already created`);
         } else {
             Object.defineProperty(this.fileConstants, key, {
@@ -63,6 +64,13 @@ class AbstractConstantMap {
         } else {
             throw new Error(`No such key: '${key}'`);
         }
+    }
+
+    /**
+     * Assign map to memory
+     */
+    init() {
+        Memory.setConstantsInstance(this);
     }
 
 }
