@@ -107,42 +107,6 @@ class AbstractPage {
             } else {
                 throw new Error(`${alias} is not collection`)
             }
-
-        // if (currentProtractorElement) {
-        //     if (newComponent.isCollection) {
-        //         if (!innerText) {
-        //             return currentProtractorElement.all(this._getSelector(newComponent)).get(index)
-        //         } else {
-        //             try {
-        //                 return currentProtractorElement
-        //                     .all(this._getSelector(newComponent))
-        //                     .filter(elem => elem.getText() === innerText)
-        //                     .first();
-        //             } catch (e) {
-        //                 throw new Error(`There is no elements with '${innerText}' text`);
-        //             }
-        //         }
-        //     } else {
-        //         throw new Error(`${alias} is not collection`)
-        //     }
-        // } else {
-        //     if (newComponent.isCollection) {
-        //         if (!innerText) {
-        //             return element.all(this._getSelector(newComponent)).get(index)
-        //         } else {
-        //             try {
-        //                 return element
-        //                     .all(this._getSelector(newComponent))
-        //                     .filter(elem => elem.getText() === innerText)
-        //                     .first();
-        //             } catch (e) {
-        //                 throw new Error(`There is no elements with '${innerText}' text`);
-        //             }
-        //         }
-        //     } else {
-        //         throw new Error(`${alias} is not collection`)
-        //     }
-        // }
     }
 
     /**
@@ -162,24 +126,6 @@ class AbstractPage {
         } else {
             return rootElement.element(this._getSelector(newComponent))
         }
-
-        // if (currentProtractorElement) {
-        //     if (newComponent.isCollection) {
-        //         return currentProtractorElement.all(this._getSelector(newComponent))
-        //     } else {
-        //         if (currentProtractorElement.count) {
-        //             return currentProtractorElement.all(this._getSelector(newComponent))
-        //         } else {
-        //             return currentProtractorElement.element(this._getSelector(newComponent))
-        //         }
-        //     }
-        // } else {
-        //     if (newComponent.isCollection) {
-        //         return element.all(this._getSelector(newComponent))
-        //     } else {
-        //         return element(this._getSelector(newComponent))
-        //     }
-        // }
     }
 
     /**
