@@ -1,3 +1,5 @@
+const Memory = require("./Memory");
+
 class AbstractCalculablesMap {
 
     constructor() {
@@ -10,10 +12,7 @@ class AbstractCalculablesMap {
      * @param lambda - function to calculate calculable
      */
     defineCalculable(signature, lambda) {
-        this.calculables.push({
-            signature: signature,
-            lambda: lambda
-        })
+        this.calculables.push(new Calculable(signature, lambda))
     }
 
     /**
@@ -38,12 +37,31 @@ class AbstractCalculablesMap {
      */
     _getArguments(signature) {
         const PARSE_REGEXP = /^.+?\((.+)\)$/;
-        const parsedSignature = signature.match(PARSE_REGEXP);
-
-        if (parsedSignature && parsedSignature.length > 1) {
-            return parsedSignature[1].split(/,\s*/);
+        const SPLIT_ARGS_REGEXP = /\s*,\s*/;
+        if (PARSE_REGEXP.test(signature)) {
+            return signature.match(PARSE_REGEXP)[1].split(SPLIT_ARGS_REGEXP)
         } else return []
+    }
 
+    /**
+     * Assign map to memory
+     */
+    init() {
+        Memory.setConstantsInstance(this);
+    }
+
+}
+
+class Calculable {
+
+    /**
+     * Constructor of calculable
+     * @param signature {RegExp} - signature of calculable
+     * @param lambda {Function} - function to calculate calculable
+     */
+    constructor (signature, lambda) {
+        this.signature = signature;
+        this.lambda = lambda;
     }
 
 }

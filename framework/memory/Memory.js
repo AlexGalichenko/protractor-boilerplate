@@ -3,7 +3,7 @@ class Memory {
     /**
      * @param calculablesInstance - instance of calculables map
      */
-    static setCalculables(calculablesInstance) {
+    static setCalculablesInstance(calculablesInstance) {
         this.calculablesInstance = calculablesInstance;
     }
     /**
