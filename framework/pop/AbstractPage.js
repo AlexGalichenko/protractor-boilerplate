@@ -184,7 +184,7 @@ class AbstractPage {
      * @private
      */
     _parseToken(token) {
-        const ELEMENT_OF_COLLECTION_REGEXP = /#([!\$]?\w+)\s+(in|of)\s+(.+)/;
+        const ELEMENT_OF_COLLECTION_REGEXP = /#([!\$]?.+)\s+(in|of)\s+(.+)/;
         if (ELEMENT_OF_COLLECTION_REGEXP.test(token)) {
             const parsedTokens = token.match(ELEMENT_OF_COLLECTION_REGEXP);
             const rememberedValue = this._getValueFromMemory(parsedTokens[1]);
