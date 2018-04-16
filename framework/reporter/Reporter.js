@@ -6,7 +6,7 @@ const JunitReport = require("./JunitReport");
 const os = require("os");
 
 /**
- * Report
+ * Reporter
  * @type {Report}
  */
 class Reporter {
@@ -54,6 +54,7 @@ class Reporter {
      * Glue reports in case of parallels run
      * @param {string} pathToJson - path to json
      * @param {Function} cb - function called to glued report
+     * @private
      */
     static glueReports(pathToJson, cb) {
         return fs.access(path.resolve(pathToJson), (notExist) => {

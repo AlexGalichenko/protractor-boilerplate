@@ -1,12 +1,12 @@
 /**
- * JuintRepot
+ * Juint Reporter
  * @type {JunitReport}
  */
 class JunitReport {
 
     /**
      * Constructor of JunitReport
-     * @param {Object} jsonData 
+     * @param {Object} jsonData - cucumber json report
      */
     constructor(jsonData) {
         this.jsonData = JSON.parse(jsonData);
@@ -14,6 +14,8 @@ class JunitReport {
 
     /**
      * Build xml
+     * @example
+     * new JunitReport(jsonDate).build();
      */
     build() {
         return {

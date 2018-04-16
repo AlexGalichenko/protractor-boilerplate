@@ -1,13 +1,12 @@
 {
   "name": "protractor-cucumber-boilerplate",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AlexGalichenko/protractor-boilerplate.git"
   },
   "scripts": {
-    "updateIE": "webdriver-manager update --ie",
-    "update": "webdriver-manager update --versions.chrome=2.32"
+    "docs": "node ./node_modules/jsdoc/jsdoc ./framework/ -r -t ./node_modules/minami"
   },
   "bugs": {
     "url": "https://github.com/AlexGalichenko/protractor-boilerplate/issues"
@@ -35,5 +34,9 @@
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "xml2js": "^0.4.19"
+  },
+  "devDependencies": {
+    "jsdoc": "^3.5.5",
+    "minami": "^1.2.3"
   }
 }

@@ -1,6 +1,7 @@
 const Memory = require("./Memory");
 
 /**
+ * Class represneting Calculable Map
  * @abstract 
  * @type {AbstractCalculablesMap}
  */
@@ -14,6 +15,15 @@ class AbstractCalculablesMap {
      * Define calculable value
      * @param {RegExp} signature - signature of calculable
      * @param {Function} lambda - function to calculate calculable
+     * @example 
+     * class CalculablesMap extends AbstractCalculablesMap {
+     *   constructor() {
+     *     super();
+     *     this.defineCalculable(/^yourCalculable\(.+\)$/, args => {
+     *       console.log(args);
+     *     })
+     *   }
+     * }
      */
     defineCalculable(signature, lambda) {
         this.calculables.push(new Calculable(signature, lambda))
@@ -56,6 +66,10 @@ class AbstractCalculablesMap {
 
 }
 
+/**
+ * Class representing Calculable
+ * @type {Calculable}
+ */
 class Calculable {
 
     /**

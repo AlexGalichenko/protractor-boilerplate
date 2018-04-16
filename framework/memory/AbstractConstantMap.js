@@ -3,6 +3,7 @@ const path = require("path");
 const fs = require("fs");
 
 /**
+ * Class representing Constant Map
  * @abstract 
  * @type {AbstractConstantMap}
  */
@@ -17,6 +18,13 @@ class AbstractConstantMap {
      * Define constant
      * @param {string} key - key
      * @param {any} givenValue - value
+     * @example
+     * class ConstantsMap extends AbstractConstantsMap {
+     *   constructor() {
+     *       super();
+     *       this.defineConstant(key, "value")
+     *   }
+     * }
      */
     defineConstant(key, givenValue) {
         if (this.constants[key] !== undefined) {

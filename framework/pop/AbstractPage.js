@@ -14,23 +14,35 @@ class AbstractPage {
 
     /**
      * Define element on page
-     * @example this.defineElement("YourElement", "div > div", "cssContainingText", "some text") //define element by provided selector
      * @param {string} alias - alias
      * @param {string} selector - selector 
      * @param {string} [selectorType] - selector type (css, cssContainingText, xpath) (default css)
      * @param {string} [text] - text (for cssContainingText selector type)
+     * @example
+     * class Page extends AbstractPage {
+     *   constructor() {
+     *     super();
+     *     this.defineElement("YourElement", "div > div", "cssContainingText", "some text");
+     *   }
+     * }
      */
     defineElement(alias, selector, selectorType, text) {
-        this.elements.set(alias, new Element(alias, selector, selectorType, text))
+        this.elements.set(alias, new Element(alias, selector, selectorType, text));
     }
 
     /**
      * Define collection on page
-     * @example this.defineCollection("YourCollection", "div > div", "cssContainingText", "some text") //define collection by provided selector
      * @param {string} alias - alias
      * @param {string} selector - selector 
      * @param {string} [selectorType] - selector type (css, cssContainingText, xpath) (default css)
      * @param {string} [text] - text (for cssContainingText selector type)
+     * @example
+     * class Page extends AbstractPage {
+     *   constructor() {
+     *     super();
+     *     this.defineCollection("YourCollection", "div > div", "cssContainingText", "some text")
+     *   }
+     * }
      */
     defineCollection(alias, selector, selectorType, text) {
         this.elements.set(alias, new Collection(alias, selector, selectorType, text))
@@ -38,9 +50,15 @@ class AbstractPage {
 
     /**
      * Define component on page
-     * @example this.defineComponent("YourComponent", new CustomComponent()) //define component
      * @param {string} alias - alias
      * @param {Component} component - component 
+     * @example
+     * class Page extends AbstractPage {
+     *   constructor() {
+     *     super();
+     *     this.defineComponent("YourComponent", new CustomComponent());
+     *   }
+     * }
      */
     defineComponent(alias, component) {
         this.elements.set(alias, component)

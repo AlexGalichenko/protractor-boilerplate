@@ -3,6 +3,7 @@ const path = require("path");
 
 /**
  * Get CLI argument by name
+ * @private
  * @param {string} argumentName - name of argument
  * @param {string|number|null} argv - value of argument
  */
@@ -19,6 +20,7 @@ function parseArgv(argumentName, argv) {
 
 /**
  * Prepare folders before test
+ * @private
  * @throws {Error}
  */
 function prepareFolders() {
@@ -46,6 +48,7 @@ function prepareFolders() {
 
 /**
  * Parse gulp args
+ * @private
  * @param {{env, tags, browser, instances, baseUrl}} env 
  * @return {Array} array of args
  */

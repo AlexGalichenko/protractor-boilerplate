@@ -5,14 +5,16 @@ const CredentialManager = require("./CredentialManager");
 const credentialServerPort = utils.parseArgv("credentialServerPort", process.argv) || 3099;
 
 /**
+ * Class representing Credential Manager
  * @implements {CredentialManager}
  */
 class ServerCredentialManager extends CredentialManager {
 
     /**
      * Create pool of userIds based on creds object
-     * @param {Object} creds
+     * @param {Object} creds - set of user credentials
      * @throws {Error}
+     * @example CredentialManager.createPool(credentials);
      */
     static createPool(creds) {
         return request({
@@ -30,6 +32,9 @@ class ServerCredentialManager extends CredentialManager {
      * Return free credentials from pool
      * @return {Promise<Object>} - promise that resolves with set of credentials
      * @throws {Error}
+     * @example 
+     * CredentialManager.getCredentials();
+     * const currentCredentials = await CredentialManager.credentials;
      */
     static getCredentials() {
         this.credentials = request({
@@ -45,6 +50,7 @@ class ServerCredentialManager extends CredentialManager {
     /**
      * Free credentials
      * @throws {Error}
+     * @example CredentialManager.freeCredentials();
      */
     static freeCredentials() {
         return this.credentials.then(credentials => {

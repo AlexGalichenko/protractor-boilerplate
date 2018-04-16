@@ -1,6 +1,7 @@
 const State = require("../state/State");
 
 /**
+ * Class representing Page Map
  * @abstract
  * @type {AbstractPageMap}
  */
@@ -12,10 +13,16 @@ class AbstractPageMap {
 
     /**
      * Define page by page selector
-     * @example this.definePage("Your Page", /^.+page.html$/, new YourPage()) //define new page with regexp selector
      * @param {string} alias - alias of page
      * @param {RegExp} selector - regexp selector of page
      * @param {AbstractPage} pageObject - constructed page
+     * @example
+     * class PageMap extends AbstractPageMap {
+     *   constructor() {
+     *     super();
+     *     this.definePage("Your Page", /^.+page.html$/, new YourPage())
+     *   }
+     * }
      */
     definePage(alias, selector, pageObject) {
         this.pages.set(alias, new PageDefinition(alias, selector, pageObject))
@@ -41,13 +48,17 @@ class AbstractPageMap {
 
 }
 
+/**
+ * Class representing page definition
+ * @type {PageDefinition}
+ */
 class PageDefinition {
 
     /**
      * Page definition
-     * @param {string} alias 
-     * @param {RegExp} selector 
-     * @param {AbstractPage} pageObject 
+     * @param {string} alias - alias
+     * @param {RegExp} selector - selector
+     * @param {AbstractPage} pageObject - page object
      */
     constructor(alias, selector, pageObject) {
         this.alias = alias;

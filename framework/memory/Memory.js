@@ -1,3 +1,7 @@
+/**
+ * Class representing Memory
+ * @type {Memory}
+ */
 class Memory {
 
     /**
@@ -20,9 +24,9 @@ class Memory {
 
     /**
      * Bind value to memory class
-     * @example Memory.setValue("key", 1) //remember 1 as key
      * @param {string} key - key
      * @param {string} value - value
+     * @example Memory.setValue("key", 1)
      */
     static setValue(key, value) {
         if (!this.memory) {
@@ -34,10 +38,10 @@ class Memory {
 
     /**
      * Returns value if exists in memory
-     * @example Memory.parseValue("$key") // return value stored in memory by key - key
      * @param {string} key - key
-     * @return {string} parsed value
+     * @return {string} - parsed value
      * @throws {Error}
+     * @example Memory.parseValue("$key")
      */
     static parseValue(key) {
         const MEMORY_REGEXP = /^(\$|#|!{1,2})?([^$#!]?.+)$/;
