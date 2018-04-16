@@ -1,16 +1,20 @@
 const AbstractPage = require("./AbstractPage");
 
+/**
+ * Component
+ * @type {Component}
+ */
 class Component extends AbstractPage {
 
     /**
      * Constructor of component or collection of components
-     * @param alias
-     * @param selector
-     * @param isCollection
-     * @param selectorType
-     * @param text
+     * @param {string} alias - alias of Collection
+     * @param {string} selector - selector
+     * @param {boolean} [isCollection] - isCollection flag
+     * @param {string} [selectorType] - selector type (css, cssContainingText, xpath)
+     * @param {string} [text] - text for cssContainingText
      */
-    constructor(alias, selector, isCollection, selectorType = "css", text) {
+    constructor(alias, selector, isCollection = false, selectorType = "css", text = "") {
         super();
 
         if (!alias) {

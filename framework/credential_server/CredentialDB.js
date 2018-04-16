@@ -1,3 +1,7 @@
+/**
+ * @type {CredentialDB}
+ * @property {Array<Object>} credentials - array of credentials
+ */
 class CredentialDB {
 
     constructor() {
@@ -6,7 +10,7 @@ class CredentialDB {
 
     /**
      * Create credentials pool
-     * @param creds
+     * @param {Object} creds
      */
     createPool(creds) {
         this.credentials = creds.map(item => {
@@ -17,7 +21,8 @@ class CredentialDB {
 
     /**
      * Get free credential
-     * @return {*}
+     * @return {Object}
+     * @throws {Error}
      */
     getCredentials() {
         const freeUserIndex = this.credentials.findIndex(item => item.isLocked === false);
@@ -32,7 +37,8 @@ class CredentialDB {
 
     /**
      * Free credentials by username
-     * @param username
+     * @param {string} username - username to free
+     * @throws {Error}
      */
     freeCredentials(username) {
         const userIndex = this.credentials.findIndex(item => item.username === username);

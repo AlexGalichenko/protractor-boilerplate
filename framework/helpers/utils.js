@@ -1,6 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 
+/**
+ * Get CLI argument by name
+ * @param {string} argumentName - name of argument
+ * @param {string|number|null} argv - value of argument
+ */
 function parseArgv(argumentName, argv) {
     const ARGV_REGEXP = new RegExp(`^.+--${argumentName}\\s(.+?)(\\s.+$|$)`);
     const joinedArgv = argv.join(" ");
@@ -14,6 +19,7 @@ function parseArgv(argumentName, argv) {
 
 /**
  * Prepare folders before test
+ * @throws {Error}
  */
 function prepareFolders() {
     return fs.exists(path.resolve("./test"), (isFolderExist) => {
@@ -40,7 +46,7 @@ function prepareFolders() {
 
 /**
  * Parse gulp args
- * @param env {{env, tags, browser, instances, baseUrl}}
+ * @param {{env, tags, browser, instances, baseUrl}} env 
  * @return {Array} array of args
  */
 function parseGulpArgs(env) {

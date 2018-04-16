@@ -1,7 +1,13 @@
-"use strict";
-
+/**
+ * JuintRepot
+ * @type {JunitReport}
+ */
 class JunitReport {
 
+    /**
+     * Constructor of JunitReport
+     * @param {Object} jsonData 
+     */
     constructor(jsonData) {
         this.jsonData = JSON.parse(jsonData);
     }
@@ -25,8 +31,8 @@ class JunitReport {
 
     /**
      * Get test cases data
-     * @param testSuiteData
-     * @return {Array}
+     * @param {Array<Object>} testSuiteData
+     * @return {Array<Object>}
      * @private
      */
     _getTestCases(testSuiteData) {
@@ -50,8 +56,8 @@ class JunitReport {
 
     /**
      * Get properties data of test suite
-     * @param testSuiteData
-     * @return {Array}
+     * @param {Object} testSuiteData
+     * @return {Array<Object>}
      * @private
      */
     _getProperties(testSuiteData) {
@@ -69,8 +75,8 @@ class JunitReport {
 
     /**
      * Get test suite attrs
-     * @param testSuiteData
-     * @return {{name, package, id: number}}
+     * @param {Object} testSuiteData
+     * @return {{name, package, id}}
      * @private
      */
     _getTestSuiteAttrs(testSuiteData) {

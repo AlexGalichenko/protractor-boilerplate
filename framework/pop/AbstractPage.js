@@ -2,6 +2,10 @@ const Memory = require("../memory/Memory");
 const Element = require("./Element");
 const Collection = require("./Collection");
 
+/**
+ * @abstract 
+ * @type {AbstractPage}
+ */
 class AbstractPage {
 
     constructor() {
@@ -9,31 +13,34 @@ class AbstractPage {
     }
 
     /**
-     * Define element
-     * @param alias
-     * @param selector
-     * @param selectorType
-     * @param text
+     * Define element on page
+     * @example this.defineElement("YourElement", "div > div", "cssContainingText", "some text") //define element by provided selector
+     * @param {string} alias - alias
+     * @param {string} selector - selector 
+     * @param {string} [selectorType] - selector type (css, cssContainingText, xpath) (default css)
+     * @param {string} [text] - text (for cssContainingText selector type)
      */
     defineElement(alias, selector, selectorType, text) {
         this.elements.set(alias, new Element(alias, selector, selectorType, text))
     }
 
     /**
-     * Define collection
-     * @param alias
-     * @param selector
-     * @param selectorType
-     * @param text
+     * Define collection on page
+     * @example this.defineCollection("YourCollection", "div > div", "cssContainingText", "some text") //define collection by provided selector
+     * @param {string} alias - alias
+     * @param {string} selector - selector 
+     * @param {string} [selectorType] - selector type (css, cssContainingText, xpath) (default css)
+     * @param {string} [text] - text (for cssContainingText selector type)
      */
     defineCollection(alias, selector, selectorType, text) {
         this.elements.set(alias, new Collection(alias, selector, selectorType, text))
     }
 
     /**
-     * Define component
-     * @param alias
-     * @param component
+     * Define component on page
+     * @example this.defineComponent("YourComponent", new CustomComponent()) //define component
+     * @param {string} alias - alias
+     * @param {Component} component - component 
      */
     defineComponent(alias, component) {
         this.elements.set(alias, component)
@@ -41,21 +48,22 @@ class AbstractPage {
 
     /**
      * Get element by key
-     * @param key
-     * @return {ProtractorElement|ProtractorCollection}
+     * @param {string} key - key
+     * @return {ElementFinder|ElementArrayFinder} - protractor element
      */
     getElement(key) {
-        const tokens = key.split(/\s*>\s*/);
+        const TOKEN_SPLIT_REGEXP = /\s*>\s*/;
+        const tokens = key.split(TOKEN_SPLIT_REGEXP);
         const firstToken = tokens.shift();
 
         const {protractorElement} = tokens.reduce((current, token) => {
             return {
                 protractorElement: this._getProtractorElement(current.protractorElement, current.component, token),
-                component: this._getComponent(current.component, token)
+                component: this._newComponentCreator(current.component, token)
             }
         }, {
             protractorElement: this._getProtractorElement(null, this, firstToken),
-            component: this._getComponent(this, firstToken)
+            component: this._newComponentCreator(this, firstToken)
         });
 
         return protractorElement;
@@ -63,28 +71,29 @@ class AbstractPage {
 
     /**
      * Get protractor single element or collection of elements or element from collection
-     * @param currentProtractorElement
-     * @param currentComponent
-     * @param token
-     * @return {ProtractorElement|ProtractorCollection}
+     * @param {ElementFinder|ElementArrayFinder} currentProtractorElement - current element
+     * @param {Component} currentComponent - current component
+     * @param {string} token - token to get new element
+     * @return {ElementFinder|ElementArrayFinder} - return new element
      * @private
      */
     _getProtractorElement(currentProtractorElement, currentComponent, token) {
         const {index, alias, innerText} = this._parseToken(token);
         if (index !== null) {
             return this._getElementOfCollection(currentProtractorElement, currentComponent, alias, index, innerText)
+        } else {
+            return this._getElementOrCollection(currentProtractorElement, currentComponent, alias)
         }
-        return this._getElementOrCollection(currentProtractorElement, currentComponent, alias)
     }
 
     /**
      * Get protractor element by index or text
-     * @param currentProtractorElement
-     * @param currentComponent
-     * @param alias
-     * @param index
-     * @param innerText
-     * @return {ProtractorElement}
+     * @param {ElementFinder|ElementArrayFinder} currentProtractorElement - current element
+     * @param {Component} currentComponent - current component
+     * @param {string} alias - alias to get element
+     * @param {number} [index] - index to get by index
+     * @param {string} [innerText] - text to get by text
+     * @return {ElementFinder|ElementArrayFinder} - new protractor element
      * @private
      */
     _getElementOfCollection(currentProtractorElement, currentComponent, alias, index, innerText) {
@@ -111,10 +120,10 @@ class AbstractPage {
 
     /**
      * Get protractor element or collection
-     * @param currentProtractorElement
-     * @param currentComponent
-     * @param alias
-     * @return {ProtractorElement|ProtractorCollection}
+     * @param {ElementFinder|ElementArrayFinder} currentProtractorElement - cuurent element
+     * @param {Component} currentComponent - current component
+     * @param {string} alias - alias
+     * @return {ElementFinder|ElementArrayFinder} - new protractor element
      * @private
      */
     _getElementOrCollection(currentProtractorElement, currentComponent, alias) {
@@ -130,13 +139,14 @@ class AbstractPage {
 
     /**
      * Function for verifying and returning element
-     * @param currentComponent
-     * @param alias
-     * @returns {ProtractorElement|ProtractorCollection}
-     * @throws Error
+     * @param {Component} currentComponent - current component
+     * @param {string} alias - alias
+     * @returns {Component} - new component
+     * @throws {Error}
      * @private
      */
-    _newComponentCreator(currentComponent, alias) {
+    _newComponentCreator(currentComponent, token) {
+        const {index, innerText, alias} = this._parseToken(token);
         if (currentComponent.elements.has(alias)) {
             return currentComponent.elements.get(alias)
         } else {
@@ -146,8 +156,9 @@ class AbstractPage {
 
     /**
      * Resolve element by location strategy
-     * @param element {{selectorType, selector, text}}
-     * @return {By}
+     * @param {Element|Collection|Component} element - element to get selector
+     * @return {By} - by selector
+     * @throws {Error}
      * @private
      */
     _getSelector(element) {
@@ -166,21 +177,9 @@ class AbstractPage {
     }
 
     /**
-     * Get component from component tree
-     * @param currentComponent
-     * @param token
-     * @return {V}
-     * @private
-     */
-    _getComponent(currentComponent, token) {
-        const {index, alias} = this._parseToken(token);
-        return currentComponent.elements.get(alias);
-    }
-
-    /**
      * Parse token to index or text value and alias
-     * @param token
-     * @return {*}
+     * @param {string} token - tokent to parse
+     * @return {{index, innerText, alias}} - definition of token
      * @private
      */
     _parseToken(token) {
@@ -202,8 +201,8 @@ class AbstractPage {
 
     /**
      * Get value from memory or given value
-     * @param value
-     * @returns {*}
+     * @param {string} value - key or value
+     * @returns {any} - value from memory
      * @private
      */
     _getValueFromMemory(value) {
@@ -213,7 +212,7 @@ class AbstractPage {
             case "$": return Memory.parseValue(value);
             default: try {
                 return Memory.parseValue(`#${value}`);
-            } catch (e){
+            } catch (e) {
                 return value - 1;
             }
         }

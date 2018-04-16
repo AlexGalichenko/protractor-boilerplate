@@ -1,22 +1,28 @@
 class Memory {
 
     /**
-     * @param calculablesInstance - instance of calculables map
+     * Set calculable instance
+     * @example Memory.setCalculablesInstance(new yourCalculablesInstance())
+     * @param {AbstractCalculablesMap} calculablesInstance - instance of calculables map
      */
     static setCalculablesInstance(calculablesInstance) {
         this.calculablesInstance = calculablesInstance;
     }
+
     /**
-     * @param constantsInstance - instance of constants map
+     * Set constant instance
+     * @example Memory.setConstantsInstance(new yourConstantsInstance())
+     * @param {AbstractConstantMap} constantsInstance - instance of constants map
      */
     static setConstantsInstance(constantsInstance) {
         this.constantsInstance = constantsInstance;
     }
 
     /**
-     * bind value to memory class
-     * @param key
-     * @param value
+     * Bind value to memory class
+     * @example Memory.setValue("key", 1) //remember 1 as key
+     * @param {string} key - key
+     * @param {string} value - value
      */
     static setValue(key, value) {
         if (!this.memory) {
@@ -27,8 +33,9 @@ class Memory {
     }
 
     /**
-     * return value if exists in memory
-     * @param key
+     * Returns value if exists in memory
+     * @example Memory.parseValue("$key") // return value stored in memory by key - key
+     * @param {string} key - key
      * @return {string} parsed value
      * @throws {Error}
      */
@@ -49,8 +56,8 @@ class Memory {
 
     /**
      * Return value from memory
-     * @param alias
-     * @return {*}
+     * @param {string} alias - key
+     * @return {any} - value by key
      * @private
      */
     static _getMemoryValue(alias) {
@@ -62,9 +69,9 @@ class Memory {
     }
 
     /**
-     * Retuern calculated value
-     * @param alias
-     * @return {*}
+     * Return calculated value
+     * @param {string} alias - key
+     * @return {any} - value by key
      * @private
      */
     static _getCalculableValue(alias) {
@@ -76,8 +83,8 @@ class Memory {
 
     /**
      * Return constant value
-     * @param key
-     * @return {*}
+     * @param {string} key - key
+     * @return {any} - value by key
      * @private
      */
     static _getConstantValue(key) {
@@ -89,8 +96,8 @@ class Memory {
 
     /**
      * Return file constant value
-     * @param key
-     * @return {*}
+     * @param {string} key - key
+     * @return {any} - value by key
      * @private
      */
     static _getFileConstantValue(key) {

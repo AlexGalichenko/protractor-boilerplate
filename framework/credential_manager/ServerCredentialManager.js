@@ -11,7 +11,8 @@ class ServerCredentialManager extends CredentialManager {
 
     /**
      * Create pool of userIds based on creds object
-     * @param creds
+     * @param {Object} creds
+     * @throws {Error}
      */
     static createPool(creds) {
         return request({
@@ -27,6 +28,8 @@ class ServerCredentialManager extends CredentialManager {
 
     /**
      * Return free credentials from pool
+     * @return {Promise<Object>} - promise that resolves with set of credentials
+     * @throws {Error}
      */
     static getCredentials() {
         this.credentials = request({
@@ -41,6 +44,7 @@ class ServerCredentialManager extends CredentialManager {
 
     /**
      * Free credentials
+     * @throws {Error}
      */
     static freeCredentials() {
         return this.credentials.then(credentials => {

@@ -1,5 +1,9 @@
 const Memory = require("./Memory");
 
+/**
+ * @abstract 
+ * @type {AbstractCalculablesMap}
+ */
 class AbstractCalculablesMap {
 
     constructor() {
@@ -8,8 +12,8 @@ class AbstractCalculablesMap {
 
     /**
      * Define calculable value
-     * @param signature - signature of calculable
-     * @param lambda - function to calculate calculable
+     * @param {RegExp} signature - signature of calculable
+     * @param {Function} lambda - function to calculate calculable
      */
     defineCalculable(signature, lambda) {
         this.calculables.push(new Calculable(signature, lambda))
@@ -17,8 +21,8 @@ class AbstractCalculablesMap {
 
     /**
      * Get calculated value of defined calculable
-     * @param signature - signature of calculable value
-     * @return {*} - calculated value
+     * @param {string} signature - signature of calculable value
+     * @return {any} - calculated value
      */
     getCalculable(signature) {
         const calculable = this.calculables.find(item => item.signature.test(signature));
@@ -31,7 +35,7 @@ class AbstractCalculablesMap {
 
     /**
      * Parse signature and get arguments
-     * @param signature - signature to parse
+     * @param {string} signature - signature to parse
      * @return {Array<String>}
      * @private
      */
