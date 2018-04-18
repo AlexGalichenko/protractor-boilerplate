@@ -1,10 +1,15 @@
 const exec = require('child_process').exec;
 
+/**
+ * Task killer. Kill hanged drivers
+ * @type {TaskKiller}
+ */
 class TaskKiller {
 
     /**
      * Kill hang driver
-     * @param itemToKill {Array<String>} - list of items to kill
+     * @param {Array<string>} itemToKill - list of items to kill
+     * @return {Promise<void>} - promise that resolves after killing drivers
      */
     static kill(itemToKill) {
         const CMD_LIST = "tasklist /V /FO CSV";

@@ -1,13 +1,17 @@
+/**
+ * Element
+ * @type {Element}
+ */
 class Element {
 
     /**
-     * Constructor of simple element
-     * @param alias
-     * @param selector
-     * @param selectorType
-     * @param text
+     * Constructor of element
+     * @param {string} alias - alias of element
+     * @param {string} selector - selector
+     * @param {string} [selectorType] - selector type (css, cssContainingText, xpath)
+     * @param {string} [text] - text for cssContainingText
      */
-    constructor(alias, selector, selectorType = "css", text) {
+    constructor(alias, selector, selectorType = "css", text = "") {
         if (!alias) {
             throw new Error(`Alias of ${this.constructor.name} is not defined`)
         }

@@ -1,5 +1,10 @@
 const Memory = require("./Memory");
 
+/**
+ * Class represneting Calculable Map
+ * @abstract 
+ * @type {AbstractCalculablesMap}
+ */
 class AbstractCalculablesMap {
 
     constructor() {
@@ -8,8 +13,17 @@ class AbstractCalculablesMap {
 
     /**
      * Define calculable value
-     * @param signature - signature of calculable
-     * @param lambda - function to calculate calculable
+     * @param {RegExp} signature - signature of calculable
+     * @param {Function} lambda - function to calculate calculable
+     * @example 
+     * class CalculablesMap extends AbstractCalculablesMap {
+     *   constructor() {
+     *     super();
+     *     this.defineCalculable(/^yourCalculable\(.+\)$/, args => {
+     *       console.log(args);
+     *     })
+     *   }
+     * }
      */
     defineCalculable(signature, lambda) {
         this.calculables.push(new Calculable(signature, lambda))
@@ -17,8 +31,8 @@ class AbstractCalculablesMap {
 
     /**
      * Get calculated value of defined calculable
-     * @param signature - signature of calculable value
-     * @return {*} - calculated value
+     * @param {string} signature - signature of calculable value
+     * @return {any} - calculated value
      */
     getCalculable(signature) {
         const calculable = this.calculables.find(item => item.signature.test(signature));
@@ -31,11 +45,11 @@ class AbstractCalculablesMap {
 
     /**
      * Parse signature and get arguments
-     * @param signature - signature to parse
+     * @param {string} signature - signature to parse
      * @return {Array<String>}
      * @private
      */
-    _getArguments(signature) {
+    static _getArguments(signature) {
         const PARSE_REGEXP = /^.+?\((.+)\)$/;
         const SPLIT_ARGS_REGEXP = /\s*,\s*/;
         if (PARSE_REGEXP.test(signature)) {
@@ -45,6 +59,15 @@ class AbstractCalculablesMap {
 
     /**
      * Assign map to memory
+     * @example
+     * class CalculablesMap extends AbstractCalculablesMap {
+     *   constructor() {
+     *     super();
+     *     this.defineCalculable(/^numberOne$/, () => 1);
+     *   }
+     *}
+     *
+     * new CalculablesMap.init();
      */
     init() {
         Memory.setCalculablesInstance(this);
@@ -52,6 +75,10 @@ class AbstractCalculablesMap {
 
 }
 
+/**
+ * Class representing Calculable
+ * @type {Calculable}
+ */
 class Calculable {
 
     /**

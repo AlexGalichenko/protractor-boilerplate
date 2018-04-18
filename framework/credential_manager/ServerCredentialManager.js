@@ -1,22 +1,24 @@
 const utils = require("../helpers/utils");
 const path = require("path");
 const request = require("request-promise");
-const CredentialManager = require("./CredentialManager");
 const credentialServerPort = utils.parseArgv("credentialServerPort", process.argv) || 3099;
+const SERVICE_URI = "http://localhost:" + credentialServerPort + "/credentials";
 
 /**
- * @implements {CredentialManager}
+ * Class representing Credential Manager
  */
-class ServerCredentialManager extends CredentialManager {
+class ServerCredentialManager {
 
     /**
      * Create pool of userIds based on creds object
-     * @param creds
+     * @param {Object} creds - set of user credentials
+     * @throws {Error}
+     * @example CredentialManager.createPool(credentials);
      */
     static createPool(creds) {
         return request({
             method: "POST",
-            uri: "http://localhost:" + credentialServerPort + "/credentials",
+            uri: SERVICE_URI,
             body: creds,
             json: true
         })
@@ -27,11 +29,16 @@ class ServerCredentialManager extends CredentialManager {
 
     /**
      * Return free credentials from pool
+     * @return {Promise<Object>} - promise that resolves with set of credentials
+     * @throws {Error}
+     * @example 
+     * CredentialManager.getCredentials();
+     * const currentCredentials = await CredentialManager.credentials;
      */
     static getCredentials() {
         this.credentials = request({
             method: "GET",
-            uri: "http://localhost:" + credentialServerPort + "/credentials",
+            uri: SERVICE_URI,
         })
         .then((body) => JSON.parse(body))
         .catch(e => {
@@ -41,12 +48,14 @@ class ServerCredentialManager extends CredentialManager {
 
     /**
      * Free credentials
+     * @throws {Error}
+     * @example CredentialManager.freeCredentials();
      */
     static freeCredentials() {
         return this.credentials.then(credentials => {
             return request({
                 method: "PUT",
-                uri: "http://localhost:" + credentialServerPort + "/credentials",
+                uri: SERVICE_URI,
                 body: {
                     username: credentials.username
                 },

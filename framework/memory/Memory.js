@@ -1,22 +1,32 @@
+/**
+ * Class representing Memory
+ * @type {Memory}
+ */
 class Memory {
 
     /**
-     * @param calculablesInstance - instance of calculables map
+     * Set calculable instance
+     * @example Memory.setCalculablesInstance(new yourCalculablesInstance())
+     * @param {AbstractCalculablesMap} calculablesInstance - instance of calculables map
      */
     static setCalculablesInstance(calculablesInstance) {
         this.calculablesInstance = calculablesInstance;
     }
+
     /**
-     * @param constantsInstance - instance of constants map
+     * Set constant instance
+     * @example Memory.setConstantsInstance(new yourConstantsInstance())
+     * @param {AbstractConstantMap} constantsInstance - instance of constants map
      */
     static setConstantsInstance(constantsInstance) {
         this.constantsInstance = constantsInstance;
     }
 
     /**
-     * bind value to memory class
-     * @param key
-     * @param value
+     * Bind value to memory class
+     * @param {string} key - key
+     * @param {string} value - value
+     * @example Memory.setValue("key", 1)
      */
     static setValue(key, value) {
         if (!this.memory) {
@@ -27,10 +37,11 @@ class Memory {
     }
 
     /**
-     * return value if exists in memory
-     * @param key
-     * @return {string} parsed value
+     * Returns value if exists in memory
+     * @param {string} key - key
+     * @return {string|number|Object} - parsed value
      * @throws {Error}
+     * @example Memory.parseValue("$key")
      */
     static parseValue(key) {
         const MEMORY_REGEXP = /^(\$|#|!{1,2})?([^$#!]?.+)$/;
@@ -49,8 +60,8 @@ class Memory {
 
     /**
      * Return value from memory
-     * @param alias
-     * @return {*}
+     * @param {string} alias - key
+     * @return {string|number|Object} - value by key
      * @private
      */
     static _getMemoryValue(alias) {
@@ -62,9 +73,9 @@ class Memory {
     }
 
     /**
-     * Retuern calculated value
-     * @param alias
-     * @return {*}
+     * Return calculated value
+     * @param {string} alias - key
+     * @return {string|number|Object} - value by key
      * @private
      */
     static _getCalculableValue(alias) {
@@ -76,8 +87,8 @@ class Memory {
 
     /**
      * Return constant value
-     * @param key
-     * @return {*}
+     * @param {string} key - key
+     * @return {string|number|Object} - value by key
      * @private
      */
     static _getConstantValue(key) {
@@ -89,8 +100,8 @@ class Memory {
 
     /**
      * Return file constant value
-     * @param key
-     * @return {*}
+     * @param {string} key - key
+     * @return {string|Buffer} - value by key
      * @private
      */
     static _getFileConstantValue(key) {

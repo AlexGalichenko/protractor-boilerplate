@@ -2,6 +2,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const CredentialDB = require("./CredentialDB");
 
+/**
+ * @type {CredentialServer}
+ */
 class CredentialServer {
 
     constructor() {
@@ -38,6 +41,10 @@ class CredentialServer {
 
     }
 
+    /**
+     * Start server
+     * @param {number} port - port to start the server
+     */
     start(port) {
         this.server.listen(port);
     }

@@ -2,6 +2,10 @@ const Memory = require("../memory/Memory");
 const Element = require("./Element");
 const Collection = require("./Collection");
 
+/**
+ * @abstract 
+ * @type {AbstractPage}
+ */
 class AbstractPage {
 
     constructor() {
@@ -9,116 +13,133 @@ class AbstractPage {
     }
 
     /**
-     * Define element
-     * @param alias
-     * @param selector
-     * @param selectorType
-     * @param text
+     * Define element on page
+     * @param {string} alias - alias
+     * @param {string} selector - selector 
+     * @param {string} [selectorType] - selector type (css, cssContainingText, xpath) (default css)
+     * @param {string} [text] - text (for cssContainingText selector type)
+     * @example
+     * class Page extends AbstractPage {
+     *   constructor() {
+     *     super();
+     *     this.defineElement("YourElement", "div > div", "cssContainingText", "some text");
+     *   }
+     * }
      */
     defineElement(alias, selector, selectorType, text) {
-        this.elements.set(alias, new Element(alias, selector, selectorType, text))
+        this.elements.set(alias, new Element(alias, selector, selectorType, text));
     }
 
     /**
-     * Define collection
-     * @param alias
-     * @param selector
-     * @param selectorType
-     * @param text
+     * Define collection on page
+     * @param {string} alias - alias
+     * @param {string} selector - selector 
+     * @param {string} [selectorType] - selector type (css, cssContainingText, xpath) (default css)
+     * @param {string} [text] - text (for cssContainingText selector type)
+     * @example
+     * class Page extends AbstractPage {
+     *   constructor() {
+     *     super();
+     *     this.defineCollection("YourCollection", "div > div", "cssContainingText", "some text")
+     *   }
+     * }
      */
     defineCollection(alias, selector, selectorType, text) {
-        this.elements.set(alias, new Collection(alias, selector, selectorType, text))
+        this.elements.set(alias, new Collection(alias, selector, selectorType, text));
     }
 
     /**
-     * Define component
-     * @param alias
-     * @param component
+     * Define component on page
+     * @param {string} alias - alias
+     * @param {Component} component - component 
+     * @example
+     * class Page extends AbstractPage {
+     *   constructor() {
+     *     super();
+     *     this.defineComponent("YourComponent", new CustomComponent());
+     *   }
+     * }
      */
     defineComponent(alias, component) {
-        this.elements.set(alias, component)
+        this.elements.set(alias, component);
     }
 
     /**
      * Get element by key
-     * @param key
-     * @return {ProtractorElement|ProtractorCollection}
+     * @param {string} key - key
+     * @return {ElementFinder|ElementArrayFinder} - protractor element
      */
     getElement(key) {
-        const tokens = key.split(/\s*>\s*/);
+        const TOKEN_SPLIT_REGEXP = /\s*>\s*/;
+        const tokens = key.split(TOKEN_SPLIT_REGEXP);
         const firstToken = tokens.shift();
-
+        const startNode = new ComponentNode(
+            this._getProtractorElement(null, this, firstToken),
+            this._newComponentCreator(this, firstToken)
+        );
         const {protractorElement} = tokens.reduce((current, token) => {
-            return {
-                protractorElement: this._getProtractorElement(current.protractorElement, current.component, token),
-                component: this._getComponent(current.component, token)
-            }
-        }, {
-            protractorElement: this._getProtractorElement(null, this, firstToken),
-            component: this._getComponent(this, firstToken)
-        });
+            return new ComponentNode(
+                this._getProtractorElement(current.protractorElement, current.component, token),
+                this._newComponentCreator(current.component, token)
+            )
+        }, startNode);
 
         return protractorElement;
     }
 
     /**
      * Get protractor single element or collection of elements or element from collection
-     * @param currentProtractorElement
-     * @param currentComponent
-     * @param token
-     * @return {ProtractorElement|ProtractorCollection}
+     * @param {ElementFinder|ElementArrayFinder} currentProtractorElement - current element
+     * @param {Component} currentComponent - current component
+     * @param {string} token - token to get new element
+     * @return {ElementFinder|ElementArrayFinder} - return new element
      * @private
      */
     _getProtractorElement(currentProtractorElement, currentComponent, token) {
-        const {index, alias, innerText} = this._parseToken(token);
-        if (index !== null) {
-            return this._getElementOfCollection(currentProtractorElement, currentComponent, alias, index, innerText)
+        const parsedToken = new ParsedToken(token);
+        if (parsedToken.isElementOfCollection()) {
+            return this._getElementOfCollection(currentProtractorElement, currentComponent, parsedToken)
+        } else {
+            return this._getElementOrCollection(currentProtractorElement, currentComponent, parsedToken)
         }
-        return this._getElementOrCollection(currentProtractorElement, currentComponent, alias)
     }
 
     /**
      * Get protractor element by index or text
-     * @param currentProtractorElement
-     * @param currentComponent
-     * @param alias
-     * @param index
-     * @param innerText
-     * @return {ProtractorElement}
+     * @param {ElementFinder|ElementArrayFinder} currentProtractorElement - current element
+     * @param {Component} currentComponent - current component
+     * @param {ParsedToken} parsedToken - parsed token
+     * @return {ElementFinder|ElementArrayFinder} - new protractor element
      * @private
      */
-    _getElementOfCollection(currentProtractorElement, currentComponent, alias, index, innerText) {
-        const newComponent = this._newComponentCreator(currentComponent, alias);
+    _getElementOfCollection(currentProtractorElement, currentComponent, parsedToken) {
+        const newComponent = this._newComponentCreator(currentComponent, parsedToken.alias);
         const rootElement = currentProtractorElement ? currentProtractorElement : element(by.css("body"));
 
         if (newComponent.isCollection) {
-                if (!innerText) {
-                    return rootElement.all(this._getSelector(newComponent)).get(index)
-                } else {
-                    try {
-                        return rootElement
-                            .all(this._getSelector(newComponent))
-                            .filter(elem => elem.getText() === innerText)
-                            .first();
-                    } catch (e) {
-                        throw new Error(`There is no elements with '${innerText}' text`);
-                    }
-                }
-            } else {
-                throw new Error(`${alias} is not collection`)
+            const elementsCollection = rootElement.all(this._getSelector(newComponent));
+            if (parsedToken.hasTokenIn()) {
+                return elementsCollection
+                    .filter(elem => elem.getText() === parsedToken.innerText)
+                    .first();
+            } else if (parsedToken.hasTokenOf()) {
+                return elementsCollection.get(parsedToken.index)
             }
+        } else {
+            throw new Error(`${parsedToken.alias} is not collection`)
+        }
     }
 
     /**
      * Get protractor element or collection
-     * @param currentProtractorElement
-     * @param currentComponent
-     * @param alias
-     * @return {ProtractorElement|ProtractorCollection}
+     * @param {ElementFinder|ElementArrayFinder} currentProtractorElement - cuurent element
+     * @param {Component} currentComponent - current component
+     * @param {ParsedToken} parsedToken - alias
+     * @return {ElementFinder|ElementArrayFinder} - new protractor element
      * @private
      */
-    _getElementOrCollection(currentProtractorElement, currentComponent, alias) {
-        const newComponent = this._newComponentCreator(currentComponent, alias);
+    _getElementOrCollection(currentProtractorElement, currentComponent, parsedToken) {
+        const newComponent = this._newComponentCreator(currentComponent, parsedToken.alias);
         const rootElement = currentProtractorElement ? currentProtractorElement : element(by.css("body"));
 
         if (newComponent.isCollection || rootElement.count) {
@@ -130,24 +151,26 @@ class AbstractPage {
 
     /**
      * Function for verifying and returning element
-     * @param currentComponent
-     * @param alias
-     * @returns {ProtractorElement|ProtractorCollection}
-     * @throws Error
+     * @param {Component} currentComponent - current component
+     * @param {string} token - token to create new compoenent
+     * @returns {Component} - new component
+     * @throws {Error}
      * @private
      */
-    _newComponentCreator(currentComponent, alias) {
-        if (currentComponent.elements.has(alias)) {
-            return currentComponent.elements.get(alias)
+    _newComponentCreator(currentComponent, token) {
+        const parsedToken = new ParsedToken(token);
+        if (currentComponent.elements.has(parsedToken.alias)) {
+            return currentComponent.elements.get(parsedToken.alias)
         } else {
-            throw new Error(`There is no such element: '${alias}'`)
+            throw new Error(`There is no such element: '${parsedToken.alias}'`)
         }
     }
 
     /**
      * Resolve element by location strategy
-     * @param element {{selectorType, selector, text}}
-     * @return {By}
+     * @param {Element|Collection|Component} element - element to get selector
+     * @return {WebDriverLocator|ProtractorLocator} - by selector
+     * @throws {Error}
      * @private
      */
     _getSelector(element) {
@@ -160,50 +183,61 @@ class AbstractPage {
                 } else {
                     throw new Error("Text is not defined")
                 }
-            }
+            } break;
             default: throw new Error(`Selector type ${element.selectorType} is not defined`);
         }
     }
 
-    /**
-     * Get component from component tree
-     * @param currentComponent
-     * @param token
-     * @return {V}
-     * @private
-     */
-    _getComponent(currentComponent, token) {
-        const {index, alias} = this._parseToken(token);
-        return currentComponent.elements.get(alias);
-    }
+}
+
+/**
+ * Component tree node
+ * @type {ComponentNode}
+ * @private
+ */
+class ComponentNode {
 
     /**
-     * Parse token to index or text value and alias
-     * @param token
-     * @return {*}
-     * @private
+     * Constructor of Component Node
+     * @param {ElementFinder|ElementArrayFinder} protractorElement 
+     * @param {AbstractPage|Component} component 
      */
-    _parseToken(token) {
+    constructor(protractorElement, component) {
+        this.protractorElement = protractorElement;
+        this.component = component;
+    }
+
+}
+
+/**
+ * Class representing set of element of token
+ * @type {ParsedToken}
+ * @private
+ */
+class ParsedToken {
+
+    /**
+     * Define token
+     * @param {string} token 
+     */
+    constructor(token) {
         const ELEMENT_OF_COLLECTION_REGEXP = /#([!\$]?.+)\s+(in|of)\s+(.+)/;
         if (ELEMENT_OF_COLLECTION_REGEXP.test(token)) {
             const parsedTokens = token.match(ELEMENT_OF_COLLECTION_REGEXP);
             const rememberedValue = this._getValueFromMemory(parsedTokens[1]);
-            return {
-                index: parsedTokens[2] === "of" ? rememberedValue : 0,
-                innerText: parsedTokens[2] === "in" ? rememberedValue : null,
-                alias: parsedTokens[3]
-            }
-        } else return {
-            index: null,
-            alias: token,
-            innerText: null
+
+            this.index = parsedTokens[2] === "of" ? rememberedValue : undefined;
+            this.innerText = parsedTokens[2] === "in" ? rememberedValue : undefined;
+            this.alias = parsedTokens[3];
+        } else {
+            this.alias = token;
         }
     }
 
     /**
      * Get value from memory or given value
-     * @param value
-     * @returns {*}
+     * @param {string} value - key or value
+     * @returns {string|number|Object} - value from memory
      * @private
      */
     _getValueFromMemory(value) {
@@ -213,10 +247,37 @@ class AbstractPage {
             case "$": return Memory.parseValue(value);
             default: try {
                 return Memory.parseValue(`#${value}`);
-            } catch (e){
+            } catch (e) {
                 return value - 1;
             }
         }
+    }
+
+    /**
+     * Check if token is element of collection
+     * @return {boolean}
+     * @protected
+     */
+    isElementOfCollection() {
+        return this.index !== undefined || this.innerText !== undefined
+    }
+
+    /**
+     * Check if token is of
+     * @return {boolean}
+     * @protected
+     */
+    hasTokenOf() {
+        return this.index !== undefined
+    }
+
+    /**
+     * Check if token is in
+     * @return {boolean}
+     * @protected
+     */
+    hasTokenIn(){
+        return this.innerText !== undefined
     }
 
 }

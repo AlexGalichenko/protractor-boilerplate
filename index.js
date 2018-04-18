@@ -3,7 +3,6 @@ exports.Collection = require('./framework/pop/Collection');
 exports.Component = require('./framework/pop/Component');
 exports.Element = require('./framework/pop/Element');
 exports.AbstractPage = require('./framework/pop/AbstractPage');
-exports.CredentialManager = require('./framework/credential_manager/CredentialManager');
 exports.TaskKiller = require('./framework/taskskiller/TasksKiller');
 exports.Memory = require('./framework/memory/Memory');
 exports.AbstractConstantMap = require('./framework/memory/AbstractConstantMap');
