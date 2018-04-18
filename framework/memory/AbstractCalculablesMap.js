@@ -49,7 +49,7 @@ class AbstractCalculablesMap {
      * @return {Array<String>}
      * @private
      */
-    _getArguments(signature) {
+    static _getArguments(signature) {
         const PARSE_REGEXP = /^.+?\((.+)\)$/;
         const SPLIT_ARGS_REGEXP = /\s*,\s*/;
         if (PARSE_REGEXP.test(signature)) {
@@ -59,6 +59,15 @@ class AbstractCalculablesMap {
 
     /**
      * Assign map to memory
+     * @example
+     * class CalculablesMap extends AbstractCalculablesMap {
+     *   constructor() {
+     *     super();
+     *     this.defineCalculable(/^numberOne$/, () => 1);
+     *   }
+     *}
+     *
+     * new CalculablesMap.init();
      */
     init() {
         Memory.setCalculablesInstance(this);

@@ -7,7 +7,7 @@ const os = require("os");
 
 /**
  * Reporter
- * @type {Report}
+ * @type {Reporter}
  */
 class Reporter {
 

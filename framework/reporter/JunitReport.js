@@ -62,7 +62,7 @@ class JunitReport {
      * @return {Array<Object>}
      * @private
      */
-    _getProperties(testSuiteData) {
+    static _getProperties(testSuiteData) {
         return [
             {
                 property: {
@@ -81,7 +81,7 @@ class JunitReport {
      * @return {{name, package, id}}
      * @private
      */
-    _getTestSuiteAttrs(testSuiteData) {
+    static _getTestSuiteAttrs(testSuiteData) {
         return {
             name: testSuiteData.name,
             package: testSuiteData.name,

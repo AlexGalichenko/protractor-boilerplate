@@ -39,7 +39,7 @@ class Memory {
     /**
      * Returns value if exists in memory
      * @param {string} key - key
-     * @return {string} - parsed value
+     * @return {any} - parsed value
      * @throws {Error}
      * @example Memory.parseValue("$key")
      */

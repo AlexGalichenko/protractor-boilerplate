@@ -22,7 +22,7 @@ class AbstractConstantMap {
      * class ConstantsMap extends AbstractConstantsMap {
      *   constructor() {
      *       super();
-     *       this.defineConstant(key, "value")
+     *       this.defineConstant("key", "value")
      *   }
      * }
      */
@@ -41,6 +41,13 @@ class AbstractConstantMap {
      * Define file constant
      * @param {string} key - key of constant
      * @param {string} path - path to file
+     * @example
+     * class ConstantsMap extends AbstractConstantsMap {
+     *   constructor() {
+     *       super();
+     *       this.defineFileConstant("key", "./path")
+     *   }
+     * }
      */
     defineFileConstant(key, path) {
         if (this.fileConstants[key] !== undefined) {
@@ -69,7 +76,7 @@ class AbstractConstantMap {
     /**
      * Get file constant value by key
      * @param {string} key - key of file constant
-     * @return {string} - file content in utf8
+     * @return {string|Buffer} - file content in utf8
      */
     getFileConstant(key) {
         if (this.fileConstants[key] !== undefined) {
@@ -81,6 +88,15 @@ class AbstractConstantMap {
 
     /**
      * Assign map to memory
+     * @example
+     * class ConstantMap extends AbstractConstantMap {
+     *   constructor() {
+     *     super();
+     *     this.defineConstant(/^numberOne$/, "1");
+     *   }
+     *}
+     *
+     * new ConstantMap.init();
      */
     init() {
         Memory.setConstantsInstance(this);

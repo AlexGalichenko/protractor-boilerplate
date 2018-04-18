@@ -5,7 +5,8 @@ const path = require("path");
  * Get CLI argument by name
  * @private
  * @param {string} argumentName - name of argument
- * @param {string|number|null} argv - value of argument
+ * @param {Array<string>} argv - arguments to parse
+ * @return {string|number|null} argv - value of argument
  */
 function parseArgv(argumentName, argv) {
     const ARGV_REGEXP = new RegExp(`^.+--${argumentName}\\s(.+?)(\\s.+$|$)`);

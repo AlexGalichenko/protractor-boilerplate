@@ -78,7 +78,7 @@ class AbstractPage {
         const startNode = new ComponentNode(
             this._getProtractorElement(null, this, firstToken),
             this._newComponentCreator(this, firstToken)
-        )
+        );
         const {protractorElement} = tokens.reduce((current, token) => {
             return new ComponentNode(
                 this._getProtractorElement(current.protractorElement, current.component, token),
@@ -154,12 +154,12 @@ class AbstractPage {
     /**
      * Function for verifying and returning element
      * @param {Component} currentComponent - current component
-     * @param {string} alias - alias
+     * @param {string} token - token to create new compoenent
      * @returns {Component} - new component
      * @throws {Error}
      * @private
      */
-    _newComponentCreator(currentComponent, token) {
+    static _newComponentCreator(currentComponent, token) {
         const parsedToken = new ParsedToken(token);
         if (currentComponent.elements.has(parsedToken.alias)) {
             return currentComponent.elements.get(parsedToken.alias)
@@ -171,11 +171,11 @@ class AbstractPage {
     /**
      * Resolve element by location strategy
      * @param {Element|Collection|Component} element - element to get selector
-     * @return {By} - by selector
+     * @return {WebDriverLocator|ProtractorLocator} - by selector
      * @throws {Error}
      * @private
      */
-    _getSelector(element) {
+    static _getSelector(element) {
         switch (element.selectorType) {
             case "css": return by.css(element.selector);
             case "xpath": return by.xpath(element.selector);
@@ -239,10 +239,10 @@ class ParsedToken {
     /**
      * Get value from memory or given value
      * @param {string} value - key or value
-     * @returns {any} - value from memory
+     * @returns {string|number|Object} - value from memory
      * @private
      */
-    _getValueFromMemory(value) {
+    static _getValueFromMemory(value) {
         let prefix = value.charAt(0);
         switch (prefix) {
             case "!": return Memory.parseValue(value);
