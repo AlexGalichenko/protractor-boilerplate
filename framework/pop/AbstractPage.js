@@ -2,8 +2,6 @@ const Memory = require("../memory/Memory");
 const Element = require("./Element");
 const Collection = require("./Collection");
 
-const ROOT_ELEMENT = element(by.css("body"));
-
 /**
  * @abstract 
  * @type {AbstractPage}
@@ -116,7 +114,7 @@ class AbstractPage {
      */
     _getElementOfCollection(currentProtractorElement, currentComponent, parsedToken) {
         const newComponent = this._newComponentCreator(currentComponent, parsedToken.alias);
-        const rootElement = currentProtractorElement ? currentProtractorElement : ROOT_ELEMENT;
+        const rootElement = currentProtractorElement ? currentProtractorElement : element(by.css("body"));
 
         if (newComponent.isCollection) {
             const elementsCollection = rootElement.all(this._getSelector(newComponent));
@@ -142,7 +140,7 @@ class AbstractPage {
      */
     _getElementOrCollection(currentProtractorElement, currentComponent, parsedToken) {
         const newComponent = this._newComponentCreator(currentComponent, parsedToken.alias);
-        const rootElement = currentProtractorElement ? currentProtractorElement : ROOT_ELEMENT;
+        const rootElement = currentProtractorElement ? currentProtractorElement : element(by.css("body"));
 
         if (newComponent.isCollection || rootElement.count) {
             return rootElement.all(this._getSelector(newComponent))
@@ -159,7 +157,7 @@ class AbstractPage {
      * @throws {Error}
      * @private
      */
-    static _newComponentCreator(currentComponent, token) {
+    _newComponentCreator(currentComponent, token) {
         const parsedToken = new ParsedToken(token);
         if (currentComponent.elements.has(parsedToken.alias)) {
             return currentComponent.elements.get(parsedToken.alias)
@@ -175,7 +173,7 @@ class AbstractPage {
      * @throws {Error}
      * @private
      */
-    static _getSelector(element) {
+    _getSelector(element) {
         switch (element.selectorType) {
             case "css": return by.css(element.selector);
             case "xpath": return by.xpath(element.selector);
@@ -242,7 +240,7 @@ class ParsedToken {
      * @returns {string|number|Object} - value from memory
      * @private
      */
-    static _getValueFromMemory(value) {
+    _getValueFromMemory(value) {
         let prefix = value.charAt(0);
         switch (prefix) {
             case "!": return Memory.parseValue(value);
@@ -260,7 +258,7 @@ class ParsedToken {
      * @return {boolean}
      */
     isElementOfCollection() {
-        return this.index !== undefined || innerText !== undefined
+        return this.index !== undefined || this.innerText !== undefined
     }
 
     /**

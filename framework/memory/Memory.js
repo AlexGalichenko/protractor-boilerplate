@@ -39,7 +39,7 @@ class Memory {
     /**
      * Returns value if exists in memory
      * @param {string} key - key
-     * @return {any} - parsed value
+     * @return {string|number|Object} - parsed value
      * @throws {Error}
      * @example Memory.parseValue("$key")
      */
@@ -61,7 +61,7 @@ class Memory {
     /**
      * Return value from memory
      * @param {string} alias - key
-     * @return {any} - value by key
+     * @return {string|number|Object} - value by key
      * @private
      */
     static _getMemoryValue(alias) {
@@ -75,7 +75,7 @@ class Memory {
     /**
      * Return calculated value
      * @param {string} alias - key
-     * @return {any} - value by key
+     * @return {string|number|Object} - value by key
      * @private
      */
     static _getCalculableValue(alias) {
@@ -88,7 +88,7 @@ class Memory {
     /**
      * Return constant value
      * @param {string} key - key
-     * @return {any} - value by key
+     * @return {string|number|Object} - value by key
      * @private
      */
     static _getConstantValue(key) {
@@ -101,7 +101,7 @@ class Memory {
     /**
      * Return file constant value
      * @param {string} key - key
-     * @return {any} - value by key
+     * @return {string|Buffer} - value by key
      * @private
      */
     static _getFileConstantValue(key) {
