@@ -256,6 +256,7 @@ class ParsedToken {
     /**
      * Check if token is element of collection
      * @return {boolean}
+     * @protected
      */
     isElementOfCollection() {
         return this.index !== undefined || this.innerText !== undefined
@@ -264,6 +265,7 @@ class ParsedToken {
     /**
      * Check if token is of
      * @return {boolean}
+     * @protected
      */
     hasTokenOf() {
         return this.index !== undefined
@@ -272,6 +274,7 @@ class ParsedToken {
     /**
      * Check if token is in
      * @return {boolean}
+     * @protected
      */
     hasTokenIn(){
         return this.innerText !== undefined
