@@ -49,7 +49,7 @@ class AbstractCalculablesMap {
      * @return {Array<String>}
      * @private
      */
-    static _getArguments(signature) {
+    _getArguments(signature) {
         const PARSE_REGEXP = /^.+?\((.+)\)$/;
         const SPLIT_ARGS_REGEXP = /\s*,\s*/;
         if (PARSE_REGEXP.test(signature)) {

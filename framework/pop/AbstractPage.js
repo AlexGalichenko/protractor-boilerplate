@@ -114,7 +114,7 @@ class AbstractPage {
      */
     _getElementOfCollection(currentProtractorElement, currentComponent, parsedToken) {
         const newComponent = this._newComponentCreator(currentComponent, parsedToken.alias);
-        const rootElement = currentProtractorElement ? currentProtractorElement : element(by.css("body"));
+        const rootElement = currentProtractorElement ? currentProtractorElement : element(by.css("html"));
 
         if (newComponent.isCollection) {
             const elementsCollection = rootElement.all(this._getSelector(newComponent));
@@ -140,7 +140,7 @@ class AbstractPage {
      */
     _getElementOrCollection(currentProtractorElement, currentComponent, parsedToken) {
         const newComponent = this._newComponentCreator(currentComponent, parsedToken.alias);
-        const rootElement = currentProtractorElement ? currentProtractorElement : element(by.css("body"));
+        const rootElement = currentProtractorElement ? currentProtractorElement : element(by.css("html"));
 
         if (newComponent.isCollection || rootElement.count) {
             return rootElement.all(this._getSelector(newComponent))
