@@ -1,6 +1,6 @@
 {
   "name": "protractor-cucumber-boilerplate",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AlexGalichenko/protractor-boilerplate.git"
