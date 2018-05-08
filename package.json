@@ -6,14 +6,15 @@
     "url": "git+https://github.com/AlexGalichenko/protractor-boilerplate.git"
   },
   "scripts": {
-    "docs": "node ./node_modules/jsdoc/jsdoc ./framework/ -r -t ./node_modules/minami"
+    "docs": "jsdoc ./framework/ -r -t ./node_modules/minami"
   },
   "bugs": {
     "url": "https://github.com/AlexGalichenko/protractor-boilerplate/issues"
   },
   "authors": [
     "Alexander Galichenko",
-    "Kirill Bogdanets"
+    "Kirill Bogdanets",
+    "Volha Shut"
   ],
   "license": "MIT",
   "dependencies": {
