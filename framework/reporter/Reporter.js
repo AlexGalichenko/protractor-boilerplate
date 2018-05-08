@@ -19,7 +19,7 @@ class Reporter {
      */
     static generateHTMLReport(capabilities, reportPath = "./test/", jsonDir = "./test/") {
 
-        const GLUED_REPORT_PATH = "glued_report/"
+        const GLUED_REPORT_PATH = "glued_report/";
 
         this.glueReports(jsonDir + "report.json", jsonReport => {
             const gluedReport = JSON.parse(jsonReport).reduce((report, feature) => {
