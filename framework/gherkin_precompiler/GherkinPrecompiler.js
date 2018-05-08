@@ -1,12 +1,9 @@
 const Gherkin = require("gherkin");
 const fs = require("fs");
 const glob = require("glob");
-const parser = new require("cucumber-tag-expressions").TagExpressionParser();
+const parser = new (require("cucumber-tag-expressions").TagExpressionParser)();
 const path = require("path");
 const protractorConf = require(path.resolve("./protractor.conf.js"));
-
-const specs = protractorConf.config.cucumberOpts.features;
-const tagExpression = "@smoke";
 
 class GherkinPrecompiler {
 
@@ -18,7 +15,7 @@ class GherkinPrecompiler {
     constructor(specs, tagExpression = "") {
         this.specs = specs;
         this.tagExpression = tagExpression;
-        this.tempFolder = "./temp_features/";
+        this.tempFolder = "./test/temp_features/";
     }
 
     /**
@@ -34,7 +31,8 @@ class GherkinPrecompiler {
             const features = this._splitFeature(ast.feature.children, featureTemplate);
             const filteredFeatures = this._filterFeaturesByTag(features, this.tagExpression);
             filteredFeatures.forEach((splitFeature, index) => {
-                fs.writeFileSync(`${this.tempFolder}${splitFeature.feature.name}${index}.feature`, this._writeFeature(splitFeature.feature), "utf8");
+                const escapedFileName = splitFeature.feature.name.replace("[/\s]","_");
+                fs.writeFileSync(`${this.tempFolder}/${escapedFileName}${index}.feature`, this._writeFeature(splitFeature.feature), "utf8");
             })
         });
     }
@@ -107,7 +105,10 @@ class GherkinPrecompiler {
                 const feature = Object.assign({}, featureTemplate);
                 feature.feature = Object.assign({}, featureTemplate.feature);
                 feature.feature.children = Object.assign([], featureTemplate.feature.children);
-                feature.feature.children.push(scenario);
+                const updatedScenario = Object.assign({}, scenario);
+                updatedScenario.tags = Object.assign([], scenario.tags);
+                updatedScenario.tags.push(...featureTemplate.feature.tags);
+                feature.feature.children.push(updatedScenario);
                 return feature
             })
     }
@@ -164,15 +165,11 @@ class GherkinPrecompiler {
     _filterFeaturesByTag(features, tagExpression) {
         const expressionNode = parser.parse(tagExpression);
         return features.filter(feature => {
-            if (expressionNode.evaluate(feature.feature.tags.map(tag => tag.name))) {
-                return true
-            } else {
-                return feature.feature.children.some(scenario => {
-                    if (scenario.tags) {
-                        return expressionNode.evaluate(scenario.tags.map(tag => tag.name))
-                    }
-                })
-            }
+            return feature.feature.children.some(scenario => {
+                if (scenario.tags) {
+                    return expressionNode.evaluate(scenario.tags.map(tag => tag.name))
+                }
+            })
         });
     }
 
