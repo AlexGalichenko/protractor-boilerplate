@@ -40,7 +40,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     }));
 
     gulp.task("test", ["test:driver_update", "test:gherkin_precompile"], () => {
-        gulp.src([])
+        return gulp.src([])
             .pipe(protractor({
                 configFile: path.resolve("./protractor.conf.js"),
                 args: parseGulpArgs(util.env),

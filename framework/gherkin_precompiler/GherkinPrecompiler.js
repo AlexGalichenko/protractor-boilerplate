@@ -31,7 +31,7 @@ class GherkinPrecompiler {
             const features = this._splitFeature(ast.feature.children, featureTemplate);
             const filteredFeatures = this._filterFeaturesByTag(features, this.tagExpression);
             filteredFeatures.forEach((splitFeature, index) => {
-                const escapedFileName = splitFeature.feature.name.replace("[/\s]","_");
+                const escapedFileName = splitFeature.feature.name.replace(/[/\s]/g,"_");
                 fs.writeFileSync(`${this.tempFolder}/${escapedFileName}${index}.feature`, this._writeFeature(splitFeature.feature), "utf8");
             })
         });
