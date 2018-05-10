@@ -18,22 +18,43 @@ class Reporter {
      * @param {string} [jsonDir] - path to jsonDir
      */
     static generateHTMLReport(capabilities, reportPath = "./test/", jsonDir = "./test/") {
-        report.generate({
-            jsonDir: path.resolve(reportPath),
-            reportPath: path.resolve(jsonDir),
-            metadata: {
-                browser: {
-                    name: capabilities.browserName,
-                    version: capabilities.version
-                },
-                device: "PC",
-                platform: {
-                    name: os.platform() === "win32" ? "windows" : os.platform(),
-                    version: os.release()
+
+        const GLUED_REPORT_PATH = "glued_report/";
+
+        this.glueReports(jsonDir + "report.json", jsonReport => {
+            const gluedReport = JSON.parse(jsonReport).reduce((report, feature) => {
+                const featureIndex = report.findIndex(reportFeature => reportFeature.id === feature.id);
+                if (featureIndex !== -1) {
+                    report[featureIndex].elements.push(...feature.elements);
+                } else {
+                    report.push(feature);
                 }
+                return report
+            }, []);
+
+            if (!fs.existsSync(path.resolve(jsonDir + GLUED_REPORT_PATH))) {
+                fs.mkdirSync(path.resolve(jsonDir + GLUED_REPORT_PATH))
             }
+            fs.writeFileSync(path.resolve(jsonDir + GLUED_REPORT_PATH + "report.json"), JSON.stringify(gluedReport));
+
+            report.generate({
+                jsonDir: path.resolve(jsonDir + "glued_report"),
+                reportPath: path.resolve(reportPath),
+                metadata: {
+                    browser: {
+                        name: capabilities.browserName,
+                        version: capabilities.version
+                    },
+                    device: "PC",
+                    platform: {
+                        name: os.platform() === "win32" ? "windows" : os.platform(),
+                        version: os.release()
+                    }
+                }
+            });
         });
     }
+
 
     /**
      * Generate junit xml report
@@ -41,6 +62,7 @@ class Reporter {
      * @param {string} pathToXml - path to store report
      */
     static generateXMLReport(pathToJson, pathToXml) {
+        console.log(pathToJson);
         const builder = new xml2js.Builder();
         this.glueReports(pathToJson, jsonReport => {
             const xml =  builder.buildObject(new JunitReport(jsonReport).build());

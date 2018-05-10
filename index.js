@@ -11,4 +11,5 @@ exports.CredentialServer = require('./framework/credential_server/CredentialServ
 exports.ServerCredentialManager = require('./framework/credential_manager/ServerCredentialManager');
 exports.Reporter = require('./framework/reporter/Reporter');
 exports.AbstractPageMap = require('./framework/page_manager/AbstractPageMap');
+exports.GherkinPrecompiler = require('./framework/gherkin_precompiler/GherkinPrecompiler');
 exports.tasks = require('./framework/gulp/tasks');
