@@ -5,7 +5,7 @@ const util = require("gulp-util");
 const clean = require("gulp-clean");
 const {protractor, webdriver_update_specific} = require("gulp-protractor");
 const server = require("gulp-express");
-const {prepareFolders, parseGulpArgs} = require("../helpers/utils");
+const {parseGulpArgs} = require("../helpers/utils");
 const Reporter = require("../../framework/reporter/Reporter");
 const TasksKiller = require("../../framework/taskskiller/TasksKiller");
 const CredentialManager = require("../credential_manager/ServerCredentialManager");
@@ -26,7 +26,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
 
     gulp.task("test:gherkin_precompile", ["test:create_pool"], () => {
         const config = require(path.resolve("./protractor.conf.js")).config;
-        return new GherkinPrecompiler(config.cucumberOpts.features, util.env.tags).compile().catch(e => {
+        return new GherkinPrecompiler(config.specs, util.env.tags).compile().catch(e => {
             throw e
         });
     });

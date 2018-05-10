@@ -50,7 +50,7 @@ function prepareFolders() {
 /**
  * Parse gulp args
  * @private
- * @param {{env, tags, browser, instances, baseUrl}} env 
+ * @param {{env, tags, browser, instances, baseUrl}} env
  * @return {Array} array of args
  */
 function parseGulpArgs(env) {
@@ -58,6 +58,7 @@ function parseGulpArgs(env) {
         "--params.environment", env.env,
         "--cucumberOpts.tags", env.tags,
         "--capabilities.browserName", env.browser || "chrome",
+        "--capabilities.specs", "./test/temp_features/*.feature"
     ];
 
     if (env.instances > 1) {
