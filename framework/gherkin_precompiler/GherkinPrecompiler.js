@@ -117,34 +117,36 @@ class GherkinPrecompiler {
      * @private
      */
     _writeFeature(feature) {
-        const LINE_DELIMETER = "\n";
+        const LINE_DELIMITER = "\n";
 
-        let featureString = `${feature.type}: ${feature.name}${LINE_DELIMETER}`;
+        let featureString = "";
 
         if (feature.tags) {
             feature.tags.forEach(tag => {
-                featureString += `${tag.name}${LINE_DELIMETER}`
+                featureString += `${tag.name}${LINE_DELIMITER}`
             });
         }
+
+        featureString += `${feature.type}: ${feature.name}${LINE_DELIMITER}`;
 
         feature.children.forEach(scenario => {
             if (scenario.tags) {
                 scenario.tags.forEach(tag => {
-                    featureString += `${tag.name}${LINE_DELIMETER}`
+                    featureString += `${tag.name}${LINE_DELIMITER}`
                 });
             }
-            featureString += `${scenario.keyword}: ${scenario.name}${LINE_DELIMETER}`;
+            featureString += `${scenario.keyword}: ${scenario.name}${LINE_DELIMITER}`;
 
             scenario.steps.forEach(step => {
-                featureString += `${step.keyword}${step.text}${LINE_DELIMETER}`;
+                featureString += `${step.keyword}${step.text}${LINE_DELIMITER}`;
             });
 
             if (scenario.examples) {
                 const example = scenario.examples[0];
-                featureString += `Examples:${LINE_DELIMETER}`;
-                featureString += `|${example.tableHeader.cells.map(cell => `${cell.value}|`).join("")}${LINE_DELIMETER}`;
+                featureString += `Examples:${LINE_DELIMITER}`;
+                featureString += `|${example.tableHeader.cells.map(cell => `${cell.value}|`).join("")}${LINE_DELIMITER}`;
                 example.tableBody.forEach(tableRow => {
-                    featureString += `|${tableRow.cells.map(cell => `${cell.value}|`).join("")}${LINE_DELIMETER}`;
+                    featureString += `|${tableRow.cells.map(cell => `${cell.value}|`).join("")}${LINE_DELIMITER}`;
                 })
             }
         });
