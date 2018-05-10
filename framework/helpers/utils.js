@@ -55,10 +55,10 @@ function prepareFolders() {
  */
 function parseGulpArgs(env) {
     const args = [
+        "--specs", "./test/temp_features/*.feature",
         "--params.environment", env.env,
         "--cucumberOpts.tags", env.tags,
         "--capabilities.browserName", env.browser || "chrome",
-        "--capabilities.specs", "./test/temp_features/*.feature"
     ];
 
     if (env.instances > 1) {
