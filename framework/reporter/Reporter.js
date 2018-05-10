@@ -62,7 +62,6 @@ class Reporter {
      * @param {string} pathToXml - path to store report
      */
     static generateXMLReport(pathToJson, pathToXml) {
-        console.log(pathToJson);
         const builder = new xml2js.Builder();
         this.glueReports(pathToJson, jsonReport => {
             const xml =  builder.buildObject(new JunitReport(jsonReport).build());
