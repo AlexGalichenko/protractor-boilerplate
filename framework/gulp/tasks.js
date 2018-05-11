@@ -12,6 +12,7 @@ const CredentialManager = require("../credential_manager/ServerCredentialManager
 const GherkinPrecompiler = require("../gherkin_precompiler/GherkinPrecompiler");
 
 module.exports = function (gulp, envs, credentialManagerClass = CredentialManager) {
+
     gulp.task("folders:clean", () => {
         return gulp.src("test", {read: false})
             .pipe(clean());
@@ -40,6 +41,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     }));
 
     gulp.task("test", ["test:driver_update", "test:gherkin_precompile"], () => {
+        const startTime = new Date();
         return gulp.src([])
             .pipe(protractor({
                 configFile: path.resolve("./protractor.conf.js"),
@@ -47,19 +49,25 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
                 autoStartStopServer: true,
             }))
             .on("end", function () {
+                fs.writeFileSync("./test/metadata.json", JSON.stringify({
+                    startTime: startTime,
+                    endTime: new Date(),
+                    duration: ((new Date() - startTime) / 1000).toString() + " seconds"
+                }));
+                server.stop();
                 console.log("E2E Testing complete");
-                process.exit();
             })
             .on("error", function (error) {
                 console.log("E2E Tests failed");
-                process.exit(1);
+                throw error;
             });
     });
 
     gulp.task("kill", () => TasksKiller.kill(["chromedriver", "iedriverserver"]));
 
     gulp.task("report", () => {
-        Reporter.generateHTMLReport(require(path.resolve("./protractor.conf.js")).config.capabilities.metadata);
+        const metadata = Object.assign(require(path.resolve("./test/metadata.json")), require(path.resolve("./protractor.conf.js")).config.capabilities.metadata);
+        Reporter.generateHTMLReport(metadata);
         Reporter.generateXMLReport("./test/report.json", "./test/report.xml");
     });
 
