@@ -1,12 +1,13 @@
 {
   "name": "protractor-cucumber-boilerplate",
-  "version": "0.3.0",
+  "version": "0.4.2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AlexGalichenko/protractor-boilerplate.git"
   },
   "scripts": {
-    "docs": "jsdoc ./framework/ -r -t ./node_modules/minami"
+    "docs": "jsdoc ./framework/ -r -t ./node_modules/minami",
+    "webdriver:update": "webdriver-manager update"
   },
   "bugs": {
     "url": "https://github.com/AlexGalichenko/protractor-boilerplate/issues"
@@ -14,7 +15,8 @@
   "authors": [
     "Alexander Galichenko",
     "Kirill Bogdanets",
-    "Volha Shut"
+    "Volha Shut",
+    "Dzianis Patsyna"
   ],
   "license": "MIT",
   "dependencies": {

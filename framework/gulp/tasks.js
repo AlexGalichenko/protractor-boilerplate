@@ -9,12 +9,14 @@ const yargs = require("../helpers/yargs");
 const clean = require("gulp-clean");
 const {protractor, webdriver_update_specific} = require("gulp-protractor");
 const server = require("gulp-express");
+const {parseGulpArgs, writeDurationMetadata} = require("../helpers/utils");
 const Reporter = require("../../framework/reporter/Reporter");
 const TasksKiller = require("../../framework/taskskiller/TasksKiller");
 const CredentialManager = require("../credential_manager/ServerCredentialManager");
 const GherkinPrecompiler = require("../gherkin_precompiler/GherkinPrecompiler");
 
 module.exports = function (gulp, envs, credentialManagerClass = CredentialManager) {
+
     gulp.task("folders:clean", () => {
         return gulp.src("test", {read: false})
             .pipe(clean());
@@ -29,7 +31,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
 
     gulp.task("test:gherkin_precompile", ["test:create_pool"], () => {
         const config = require(path.resolve("./protractor.conf.js")).config;
-        return new GherkinPrecompiler(config.cucumberOpts.features, util.env.tags).compile().catch(e => {
+        return new GherkinPrecompiler(config.specs, util.env.tags).compile().catch(e => {
             throw e
         });
     });
@@ -43,6 +45,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     }));
 
     gulp.task("test", ["test:driver_update", "test:gherkin_precompile"], () => {
+        const startTime = new Date();
         return gulp.src([])
             .pipe(protractor({
                 configFile: path.resolve("./protractor.conf.js"),
@@ -51,19 +54,23 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
                 debug: yargs.debug === "true"
             }))
             .on("end", function () {
+                writeDurationMetadata(startTime);
+                server.stop();
                 console.log("E2E Testing complete");
-                process.exit();
             })
             .on("error", function (error) {
+                writeDurationMetadata(startTime);
+                server.stop();
                 console.log("E2E Tests failed");
-                process.exit(1);
+                console.log(error);
             });
     });
 
     gulp.task("kill", () => TasksKiller.kill(["chromedriver", "iedriverserver"]));
 
     gulp.task("report", () => {
-        Reporter.generateHTMLReport(require(path.resolve("./protractor.conf.js")).config.capabilities.metadata);
+        const metadata = Object.assign(require(path.resolve("./test/metadata.json")), require(path.resolve("./protractor.conf.js")).config.capabilities.metadata);
+        Reporter.generateHTMLReport(metadata);
         Reporter.generateXMLReport("./test/report.json", "./test/report.xml");
     });
 

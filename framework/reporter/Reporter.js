@@ -50,6 +50,15 @@ class Reporter {
                         name: os.platform() === "win32" ? "windows" : os.platform(),
                         version: os.release()
                     }
+                },
+                customData: {
+                    title: 'Run info',
+                    data: [
+                        {label: 'Project', value: 'AnswersNow'},
+                        {label: 'Duration', value: capabilities.duration},
+                        {label: 'Execution Start Time', value: capabilities.startTime},
+                        {label: 'Execution End Time', value: capabilities.endTime}
+                    ]
                 }
             });
         });
@@ -62,7 +71,6 @@ class Reporter {
      * @param {string} pathToXml - path to store report
      */
     static generateXMLReport(pathToJson, pathToXml) {
-        console.log(pathToJson);
         const builder = new xml2js.Builder();
         this.glueReports(pathToJson, jsonReport => {
             const xml =  builder.buildObject(new JunitReport(jsonReport).build());

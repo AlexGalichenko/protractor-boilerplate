@@ -57,6 +57,7 @@ function parseGulpArgs(env) {
     console.log(env)
 
     const args = [
+        "--specs", "./test/temp_features/*.feature",
         "--params.environment", env.env,
         "--cucumberOpts.tags", env.tags,
         "--capabilities.browserName", env.browser || "chrome",
@@ -77,8 +78,17 @@ function parseGulpArgs(env) {
 
 }
 
+function writeDurationMetadata(startTime) {
+    fs.writeFileSync("./test/metadata.json", JSON.stringify({
+        startTime: startTime,
+        endTime: new Date(),
+        duration: ((new Date() - startTime) / 1000).toString() + " seconds"
+    }));
+}
+
 module.exports = {
     parseArgv,
     prepareFolders,
-    parseGulpArgs
+    parseGulpArgs,
+    writeDurationMetadata
 };

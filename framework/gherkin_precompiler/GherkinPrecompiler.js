@@ -4,18 +4,21 @@ const glob = require("glob");
 const parser = new (require("cucumber-tag-expressions").TagExpressionParser)();
 const path = require("path");
 const protractorConf = require(path.resolve("./protractor.conf.js"));
+const util = require("util");
+const _ = require("lodash");
 
 class GherkinPrecompiler {
 
     /**
      * Construct precompiler object
-     * @param {string} specs - glob expression for specs
+     * @param {Array<string>} specs - glob expression for specs
      * @param {string} tagExpression - tag expression to parse
+     * @param {string} tempFolder - path to temp folder
      */
-    constructor(specs, tagExpression = "") {
+    constructor(specs, tagExpression = "", tempFolder = "./test/temp_features/") {
         this.specs = specs;
         this.tagExpression = tagExpression;
-        this.tempFolder = "./test/temp_features/";
+        this.tempFolder = tempFolder;
     }
 
     /**
@@ -23,7 +26,7 @@ class GherkinPrecompiler {
      * @return {Promise.<void>}
      */
     async compile() {
-        const filePaths = await this._getFilesPathsFromGlob(this.specs);
+        const filePaths = await this._getFilesPathsFromGlob();
         const featureTexts = this._readFiles(filePaths);
         const asts = this._parseGherkinFiles(featureTexts);
         asts.forEach(ast => {
@@ -40,16 +43,11 @@ class GherkinPrecompiler {
     /**
      * Read file paths by glob pattern
      * @private
-     * @param pattern
      * @return {Promise}
      */
-    _getFilesPathsFromGlob(pattern) {
-        return new Promise((resolve, reject) => {
-            glob(pattern, (err, files) => {
-                if (err) reject(err);
-                resolve(files);
-            });
-        });
+    async _getFilesPathsFromGlob() {
+        const notNormalizedFilePaths = await Promise.all(this.specs.map(spec => util.promisify(glob)(spec)));
+        return _.uniq(_.flatten(notNormalizedFilePaths))
     }
 
     /**
@@ -104,10 +102,9 @@ class GherkinPrecompiler {
             .map(scenario => {
                 const feature = Object.assign({}, featureTemplate);
                 feature.feature = Object.assign({}, featureTemplate.feature);
-                feature.feature.children = Object.assign([], featureTemplate.feature.children);
+                feature.feature.children = [...featureTemplate.feature.children];
                 const updatedScenario = Object.assign({}, scenario);
-                updatedScenario.tags = Object.assign([], scenario.tags);
-                updatedScenario.tags.push(...featureTemplate.feature.tags);
+                updatedScenario.tags = [...scenario.tags].concat(featureTemplate.feature.tags);
                 feature.feature.children.push(updatedScenario);
                 return feature
             })
@@ -120,34 +117,36 @@ class GherkinPrecompiler {
      * @private
      */
     _writeFeature(feature) {
-        const LINE_DELIMETER = "\n";
+        const LINE_DELIMITER = "\n";
 
-        let featureString = `${feature.type}: ${feature.name}${LINE_DELIMETER}`;
+        let featureString = "";
 
         if (feature.tags) {
             feature.tags.forEach(tag => {
-                featureString += `${tag.name}${LINE_DELIMETER}`
+                featureString += `${tag.name}${LINE_DELIMITER}`
             });
         }
+
+        featureString += `${feature.type}: ${feature.name}${LINE_DELIMITER}`;
 
         feature.children.forEach(scenario => {
             if (scenario.tags) {
                 scenario.tags.forEach(tag => {
-                    featureString += `${tag.name}${LINE_DELIMETER}`
+                    featureString += `${tag.name}${LINE_DELIMITER}`
                 });
             }
-            featureString += `${scenario.keyword}: ${scenario.name}${LINE_DELIMETER}`;
+            featureString += `${scenario.keyword}: ${scenario.name}${LINE_DELIMITER}`;
 
             scenario.steps.forEach(step => {
-                featureString += `${step.keyword}${step.text}${LINE_DELIMETER}`;
+                featureString += `${step.keyword}${step.text}${LINE_DELIMITER}`;
             });
 
             if (scenario.examples) {
                 const example = scenario.examples[0];
-                featureString += `Examples:${LINE_DELIMETER}`;
-                featureString += `|${example.tableHeader.cells.map(cell => `${cell.value}|`).join("")}${LINE_DELIMETER}`;
+                featureString += `Examples:${LINE_DELIMITER}`;
+                featureString += `|${example.tableHeader.cells.map(cell => `${cell.value}|`).join("")}${LINE_DELIMITER}`;
                 example.tableBody.forEach(tableRow => {
-                    featureString += `|${tableRow.cells.map(cell => `${cell.value}|`).join("")}${LINE_DELIMETER}`;
+                    featureString += `|${tableRow.cells.map(cell => `${cell.value}|`).join("")}${LINE_DELIMITER}`;
                 })
             }
         });
