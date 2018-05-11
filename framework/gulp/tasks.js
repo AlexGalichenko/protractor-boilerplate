@@ -48,7 +48,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         return gulp.src([])
             .pipe(protractor({
                 configFile: path.resolve("./protractor.conf.js"),
-                args: parseGulpArgs(args.argv),
+                args: parseGulpArgs(yargs.argv),
                 autoStartStopServer: true,
                 debug: yargs.debug === "true"
             }))
