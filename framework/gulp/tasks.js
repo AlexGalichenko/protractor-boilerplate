@@ -56,7 +56,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
             .on("error", function (error) {
                 writeDurationMetadata(startTime);
                 console.log("E2E Tests failed");
-                throw error;
+                console.log(error);
             });
     });
 
