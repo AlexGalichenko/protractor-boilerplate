@@ -2,9 +2,7 @@ const gulp = require("gulp");
 const fs = require("fs");
 const path = require("path");
 const {prepareFolders, parseGulpArgs, writeDurationMetadata} = require("../helpers/utils");
-
 const yargs = require("../helpers/yargs").argv;
-
 const clean = require("gulp-clean");
 const {protractor, webdriver_update_specific} = require("gulp-protractor");
 const server = require("gulp-express");
