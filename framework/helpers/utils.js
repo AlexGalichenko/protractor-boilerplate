@@ -75,8 +75,17 @@ function parseGulpArgs(env) {
     return args
 }
 
+function writeDurationMetadata(startTime) {
+    fs.writeFileSync("./test/metadata.json", JSON.stringify({
+        startTime: startTime,
+        endTime: new Date(),
+        duration: ((new Date() - startTime) / 1000).toString() + " seconds"
+    }));
+}
+
 module.exports = {
     parseArgv,
     prepareFolders,
-    parseGulpArgs
+    parseGulpArgs,
+    writeDurationMetadata
 };
