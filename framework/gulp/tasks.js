@@ -5,7 +5,7 @@ const util = require("gulp-util");
 const clean = require("gulp-clean");
 const {protractor, webdriver_update_specific} = require("gulp-protractor");
 const server = require("gulp-express");
-const {parseGulpArgs} = require("../helpers/utils");
+const {parseGulpArgs, writeDurationMetadata} = require("../helpers/utils");
 const Reporter = require("../../framework/reporter/Reporter");
 const TasksKiller = require("../../framework/taskskiller/TasksKiller");
 const CredentialManager = require("../credential_manager/ServerCredentialManager");
@@ -49,15 +49,12 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
                 autoStartStopServer: true,
             }))
             .on("end", function () {
-                fs.writeFileSync("./test/metadata.json", JSON.stringify({
-                    startTime: startTime,
-                    endTime: new Date(),
-                    duration: ((new Date() - startTime) / 1000).toString() + " seconds"
-                }));
+                writeDurationMetadata(startTime);
                 server.stop();
                 console.log("E2E Testing complete");
             })
             .on("error", function (error) {
+                writeDurationMetadata(startTime);
                 console.log("E2E Tests failed");
                 throw error;
             });
