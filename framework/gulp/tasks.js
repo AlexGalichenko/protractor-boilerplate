@@ -2,14 +2,13 @@ const gulp = require("gulp");
 const fs = require("fs");
 const path = require("path");
 const util = require("gulp-util");
-const {prepareFolders, parseGulpArgs} = require("../helpers/utils");
+const {prepareFolders, parseGulpArgs, writeDurationMetadata} = require("../helpers/utils");
 
-const yargs = require("../helpers/yargs");
+const yargs = require("../helpers/yargs").argv;
 
 const clean = require("gulp-clean");
 const {protractor, webdriver_update_specific} = require("gulp-protractor");
 const server = require("gulp-express");
-const {parseGulpArgs, writeDurationMetadata} = require("../helpers/utils");
 const Reporter = require("../../framework/reporter/Reporter");
 const TasksKiller = require("../../framework/taskskiller/TasksKiller");
 const CredentialManager = require("../credential_manager/ServerCredentialManager");
@@ -49,7 +48,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         return gulp.src([])
             .pipe(protractor({
                 configFile: path.resolve("./protractor.conf.js"),
-                args: parseGulpArgs(args.env),
+                args: parseGulpArgs(args.argv),
                 autoStartStopServer: true,
                 debug: yargs.debug === "true"
             }))

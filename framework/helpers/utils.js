@@ -54,8 +54,6 @@ function prepareFolders() {
  * @return {Array} array of args
  */
 function parseGulpArgs(env) {
-    console.log(env)
-
     const args = [
         "--specs", "./test/temp_features/*.feature",
         "--params.environment", env.env,
