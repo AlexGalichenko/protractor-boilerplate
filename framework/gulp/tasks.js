@@ -2,10 +2,13 @@ const gulp = require("gulp");
 const fs = require("fs");
 const path = require("path");
 const util = require("gulp-util");
+const {prepareFolders, parseGulpArgs} = require("../helpers/utils");
+
+const yargs = require("../helpers/yargs");
+
 const clean = require("gulp-clean");
 const {protractor, webdriver_update_specific} = require("gulp-protractor");
 const server = require("gulp-express");
-const {prepareFolders, parseGulpArgs} = require("../helpers/utils");
 const Reporter = require("../../framework/reporter/Reporter");
 const TasksKiller = require("../../framework/taskskiller/TasksKiller");
 const CredentialManager = require("../credential_manager/ServerCredentialManager");
@@ -43,8 +46,9 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         return gulp.src([])
             .pipe(protractor({
                 configFile: path.resolve("./protractor.conf.js"),
-                args: parseGulpArgs(util.env),
+                args: parseGulpArgs(args.env),
                 autoStartStopServer: true,
+                debug: yargs.debug === "true"
             }))
             .on("end", function () {
                 console.log("E2E Testing complete");
