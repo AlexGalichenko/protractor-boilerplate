@@ -50,7 +50,7 @@ function prepareFolders() {
 /**
  * Parse gulp args
  * @private
- * @param {{env, tags, browser, instances, baseUrl}} env
+ * @param {{env, tags, browser, i, baseUrl}} env 
  * @return {Array} array of args
  */
 function parseGulpArgs(env) {
@@ -61,10 +61,10 @@ function parseGulpArgs(env) {
         "--capabilities.browserName", env.browser || "chrome",
     ];
 
-    if (env.instances > 1) {
+    if (env.i > 1) {
         args.push("--capabilities.shardTestFiles");
         args.push("--capabilities.maxInstances");
-        args.push(env.instances)
+        args.push(env.i)
     }
 
     if (env.baseUrl) {
@@ -73,6 +73,7 @@ function parseGulpArgs(env) {
     }
 
     return args
+
 }
 
 function writeDurationMetadata(startTime) {

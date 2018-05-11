@@ -1,6 +1,6 @@
 {
   "name": "protractor-cucumber-boilerplate",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AlexGalichenko/protractor-boilerplate.git"
@@ -26,17 +26,17 @@
     "cucumber": "^3.1.0",
     "express": "^4.16.2",
     "gulp": "^3.9.1",
-    "gulp-protractor": "^4.1.0",
     "gulp-clean": "^0.3.2",
     "gulp-express": "^0.3.5",
-    "gulp-util": "^3.0.8",
+    "gulp-protractor": "^4.1.0",
     "mkdirp": "^0.5.1",
     "multiple-cucumber-html-reporter": "^1.2.0",
     "protractor": "^5.3.0",
     "protractor-cucumber-framework": "^4.2.0",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
-    "xml2js": "^0.4.19"
+    "xml2js": "^0.4.19",
+    "yargs": "^11.0.0"
   },
   "devDependencies": {
     "jsdoc": "^3.5.5",

@@ -1,11 +1,11 @@
 const gulp = require("gulp");
 const fs = require("fs");
 const path = require("path");
-const util = require("gulp-util");
+const {prepareFolders, parseGulpArgs, writeDurationMetadata} = require("../helpers/utils");
+const yargs = require("../helpers/yargs").argv;
 const clean = require("gulp-clean");
 const {protractor, webdriver_update_specific} = require("gulp-protractor");
 const server = require("gulp-express");
-const {parseGulpArgs, writeDurationMetadata} = require("../helpers/utils");
 const Reporter = require("../../framework/reporter/Reporter");
 const TasksKiller = require("../../framework/taskskiller/TasksKiller");
 const CredentialManager = require("../credential_manager/ServerCredentialManager");
@@ -27,13 +27,13 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
 
     gulp.task("test:gherkin_precompile", ["test:create_pool"], () => {
         const config = require(path.resolve("./protractor.conf.js")).config;
-        return new GherkinPrecompiler(config.specs, util.env.tags).compile().catch(e => {
+        return new GherkinPrecompiler(config.specs, yargs.argv.tags).compile().catch(e => {
             throw e
         });
     });
 
     gulp.task("test:create_pool", ["folders:create", "c_server"], () => {
-        return credentialManagerClass.createPool(envs[util.env.env].credentials)
+        return credentialManagerClass.createPool(envs[yargs.argv.env].credentials)
     });
 
     gulp.task("test:driver_update", webdriver_update_specific({
@@ -45,8 +45,9 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         return gulp.src([])
             .pipe(protractor({
                 configFile: path.resolve("./protractor.conf.js"),
-                args: parseGulpArgs(util.env),
+                args: parseGulpArgs(yargs.argv),
                 autoStartStopServer: true,
+                debug: yargs.debug === "true"
             }))
             .on("end", function () {
                 writeDurationMetadata(startTime);
@@ -70,7 +71,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     });
 
     gulp.task("c_server", () => {
-        server.run([__dirname + "/credential_server.js", "--credentialServerPort", util.env.credentialServerPort || 3099]);
+        server.run([__dirname + "/credential_server.js", "--credentialServerPort", yargs.argv.credentialServerPort || 3099]);
     });
 
 };
