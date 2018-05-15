@@ -54,7 +54,7 @@ class Reporter {
                 customData: {
                     title: 'Run info',
                     data: [
-                        {label: 'Project', value: 'AnswersNow'},
+                        {label: 'Project', value: capabilities.project},
                         {label: 'Duration', value: capabilities.duration},
                         {label: 'Execution Start Time', value: capabilities.startTime},
                         {label: 'Execution End Time', value: capabilities.endTime}
