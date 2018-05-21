@@ -3,7 +3,7 @@ const Element = require("./Element");
 const Collection = require("./Collection");
 
 /**
- * @abstract 
+ * @abstract
  * @type {AbstractPage}
  */
 class AbstractPage {
@@ -15,7 +15,7 @@ class AbstractPage {
     /**
      * Define element on page
      * @param {string} alias - alias
-     * @param {string} selector - selector 
+     * @param {string} selector - selector
      * @param {string} [selectorType] - selector type (css, cssContainingText, xpath) (default css)
      * @param {string} [text] - text (for cssContainingText selector type)
      * @example
@@ -33,7 +33,7 @@ class AbstractPage {
     /**
      * Define collection on page
      * @param {string} alias - alias
-     * @param {string} selector - selector 
+     * @param {string} selector - selector
      * @param {string} [selectorType] - selector type (css, cssContainingText, xpath) (default css)
      * @param {string} [text] - text (for cssContainingText selector type)
      * @example
@@ -51,7 +51,7 @@ class AbstractPage {
     /**
      * Define component on page
      * @param {string} alias - alias
-     * @param {Component} component - component 
+     * @param {Component} component - component
      * @example
      * class Page extends AbstractPage {
      *   constructor() {
@@ -115,15 +115,14 @@ class AbstractPage {
     _getElementOfCollection(currentProtractorElement, currentComponent, parsedToken) {
         const newComponent = this._newComponentCreator(currentComponent, parsedToken.alias);
         const rootElement = currentProtractorElement ? currentProtractorElement : element(by.css("html"));
-
         if (newComponent.isCollection) {
             const elementsCollection = rootElement.all(this._getSelector(newComponent));
             if (parsedToken.hasTokenIn()) {
                 return elementsCollection
-                    .filter(elem => elem.getText() === parsedToken.innerText)
+                    .filter(elem => elem.getText().then(text => text.includes(parsedToken.innerText)))
                     .first();
             } else if (parsedToken.hasTokenOf()) {
-                return elementsCollection.get(parsedToken.index)
+                return elementsCollection.get(parsedToken.index - 1)
             }
         } else {
             throw new Error(`${parsedToken.alias} is not collection`)
@@ -199,8 +198,8 @@ class ComponentNode {
 
     /**
      * Constructor of Component Node
-     * @param {ElementFinder|ElementArrayFinder} protractorElement 
-     * @param {AbstractPage|Component} component 
+     * @param {ElementFinder|ElementArrayFinder} protractorElement
+     * @param {AbstractPage|Component} component
      */
     constructor(protractorElement, component) {
         this.protractorElement = protractorElement;
@@ -218,38 +217,19 @@ class ParsedToken {
 
     /**
      * Define token
-     * @param {string} token 
+     * @param {string} token
      */
     constructor(token) {
         const ELEMENT_OF_COLLECTION_REGEXP = /#([!\$]?.+)\s+(in|of)\s+(.+)/;
         if (ELEMENT_OF_COLLECTION_REGEXP.test(token)) {
             const parsedTokens = token.match(ELEMENT_OF_COLLECTION_REGEXP);
-            const rememberedValue = this._getValueFromMemory(parsedTokens[1]);
+            const rememberedValue = Memory.parseValue(parsedTokens[1]);
 
-            this.index = parsedTokens[2] === "of" ? rememberedValue : undefined;
+            this.index = parsedTokens[2] === "of" ? Number.parseInt(rememberedValue) : undefined;
             this.innerText = parsedTokens[2] === "in" ? rememberedValue : undefined;
             this.alias = parsedTokens[3];
         } else {
             this.alias = token;
-        }
-    }
-
-    /**
-     * Get value from memory or given value
-     * @param {string} value - key or value
-     * @returns {string|number|Object} - value from memory
-     * @private
-     */
-    _getValueFromMemory(value) {
-        let prefix = value.charAt(0);
-        switch (prefix) {
-            case "!": return Memory.parseValue(value);
-            case "$": return Memory.parseValue(value);
-            default: try {
-                return Memory.parseValue(`#${value}`);
-            } catch (e) {
-                return value - 1;
-            }
         }
     }
 
