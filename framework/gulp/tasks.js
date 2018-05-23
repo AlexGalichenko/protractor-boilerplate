@@ -10,6 +10,7 @@ const Reporter = require("../../framework/reporter/Reporter");
 const TasksKiller = require("../../framework/taskskiller/TasksKiller");
 const CredentialManager = require("../credential_manager/ServerCredentialManager");
 const GherkinPrecompiler = require("../gherkin_precompiler/GherkinPrecompiler");
+const GridLauncher = require("../grid_launcher/GridLauncher");
 
 module.exports = function (gulp, envs, credentialManagerClass = CredentialManager) {
 
@@ -32,7 +33,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         });
     });
 
-    gulp.task("test:create_pool", ["folders:create", "c_server"], () => {
+    gulp.task("test:create_pool", ["folders:create", "c_server", "grid"], () => {
         return credentialManagerClass.createPool(envs[yargs.argv.env].credentials)
     });
 
@@ -72,6 +73,12 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
 
     gulp.task("c_server", () => {
         server.run([__dirname + "/credential_server.js", "--credentialServerPort", yargs.argv.credentialServerPort || 3099]);
+    });
+
+    gulp.task("grid", () => {
+        const gridLauncher = new GridLauncher();
+        gridLauncher.startHub();
+        gridLauncher.startNode();
     });
 
 };
