@@ -22,6 +22,9 @@ module.exports.argv = require("yargs")
     .option("baseUrl", {
         describe: "baseUrl",
     })
+    .option("grid", {
+        describe: "launch local selenium grid",
+    })
     .option("debug", {
         describe: "debug",
     });

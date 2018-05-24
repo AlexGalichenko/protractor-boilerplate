@@ -1,7 +1,7 @@
 const gulp = require("gulp");
 const fs = require("fs");
 const path = require("path");
-const {prepareFolders, parseGulpArgs, writeDurationMetadata} = require("../helpers/utils");
+const {parseGulpArgs, writeDurationMetadata} = require("../helpers/utils");
 const yargs = require("../helpers/yargs").argv;
 const clean = require("gulp-clean");
 const {protractor, webdriver_update_specific} = require("gulp-protractor");
@@ -10,6 +10,8 @@ const Reporter = require("../../framework/reporter/Reporter");
 const TasksKiller = require("../../framework/taskskiller/TasksKiller");
 const CredentialManager = require("../credential_manager/ServerCredentialManager");
 const GherkinPrecompiler = require("../gherkin_precompiler/GherkinPrecompiler");
+const GridLauncher = require("../grid_launcher/GridLauncher");
+const gridLauncher = new GridLauncher();
 
 module.exports = function (gulp, envs, credentialManagerClass = CredentialManager) {
 
@@ -40,7 +42,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         webdriverManagerArgs: ["--ie32", "--chrome"]
     }));
 
-    gulp.task("test", ["test:driver_update", "test:gherkin_precompile"], () => {
+    gulp.task("test", ["test:gherkin_precompile", "grid"], () => {
         const startTime = new Date();
         return gulp.src([])
             .pipe(protractor({
@@ -52,13 +54,14 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
             .on("end", function () {
                 writeDurationMetadata(startTime);
                 server.stop();
+                gridLauncher.stop();
                 console.log("E2E Testing complete");
             })
             .on("error", function (error) {
                 writeDurationMetadata(startTime);
                 server.stop();
+                gridLauncher.stop();
                 console.log("E2E Tests failed");
-                console.log(error);
             });
     });
 
@@ -72,6 +75,13 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
 
     gulp.task("c_server", () => {
         server.run([__dirname + "/credential_server.js", "--credentialServerPort", yargs.argv.credentialServerPort || 3099]);
+    });
+
+    gulp.task("grid", ["test:driver_update"], () => {
+        if (yargs.argv.grid) {
+            gridLauncher.startHub();
+            gridLauncher.startNode();
+        }
     });
 
 };
