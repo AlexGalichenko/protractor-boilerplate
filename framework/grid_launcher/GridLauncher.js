@@ -1,42 +1,53 @@
 const child_process = require("child_process");
 const path = require("path");
 const fs = require("fs");
-const process = require("process");
 
 class GridLauncher {
 
     /**
      *
-     * @param url
+     * @param config
      */
-    constructor(url = "http://192.168.56.1:4444") {
+    constructor() {
         this.nodes = [];
-        this.url = url;
-        this.binariesFolder = path.resolve("../../node_modules/protractor/node_modules/webdriver-manager/selenium");
+        this.binariesFolder = path.resolve("./node_modules/protractor/node_modules/webdriver-manager/selenium");
+        this.defaultConfigFolder = path.resolve("./node_modules/protractor-cucumber-boilerplate/framework/grid_launcher");
         this._getBinariesPath();
     }
 
     /**
      *
      */
-    startHub() {
+    startHub(config = path.resolve(this.defaultConfigFolder + "/defaultConfig.json")) {
+        this.config = config;
+        this.hubConfig = require(config);
+
         const args = [
             "-jar", this.seleniumServerPath,
-            "-role", "hub"
+            "-role", "hub",
+            "-hubConfig", this.config
         ];
+
         this.hub = child_process.spawn("java", args);
     }
 
-    startNode() {
+    startNode(nodeConfig = path.resolve(this.defaultConfigFolder + "/defaultNodeConfig.json")) {
         const args = [
             "-Dwebdriver.chrome.driver=" + this.chromedriverPath,
             "-Dwebdriver.gecko.driver=" + this.geckodriverPath,
             "-jar", this.seleniumServerPath,
             "-role", "node",
-            "-hub", this.url + "/grid/register/"
+            "-nodeConfig", nodeConfig,
         ];
 
         this.nodes.push(child_process.spawn("java", args));
+    }
+
+    stop() {
+        this.nodes.forEach(node => node.kill());
+        if (this.hub) {
+            this.hub.kill();
+        }
     }
 
     _getBinariesPath() {
@@ -50,10 +61,5 @@ class GridLauncher {
     }
 
 }
-
-const gridLauncher = new GridLauncher();
-gridLauncher.startHub();
-gridLauncher.startNode();
-
 
 module.exports = GridLauncher;
