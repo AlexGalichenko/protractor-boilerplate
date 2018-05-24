@@ -5,22 +5,20 @@ const fs = require("fs");
 class GridLauncher {
 
     /**
-     *
-     * @param config
+     * Constructor of grid launcher
      */
     constructor() {
-        this.nodes = [];
         this.binariesFolder = path.resolve("./node_modules/protractor/node_modules/webdriver-manager/selenium");
         this.defaultConfigFolder = path.resolve("./node_modules/protractor-cucumber-boilerplate/framework/grid_launcher");
-        this._getBinariesPath();
     }
 
     /**
-     *
+     * Start hub
+     * @param {string} [config] - path to hub config
      */
     startHub(config = path.resolve(this.defaultConfigFolder + "/defaultConfig.json")) {
+        this._getBinariesPath();
         this.config = config;
-        this.hubConfig = require(config);
 
         const args = [
             "-jar", this.seleniumServerPath,
@@ -31,7 +29,15 @@ class GridLauncher {
         this.hub = child_process.spawn("java", args);
     }
 
+    /**
+     * Start node
+     * @param {string} [nodeConfig] - path to node config
+     */
     startNode(nodeConfig = path.resolve(this.defaultConfigFolder + "/defaultNodeConfig.json")) {
+        this._getBinariesPath();
+        if (!this.nodes) {
+            this.nodes = [];
+        }
         const args = [
             "-Dwebdriver.chrome.driver=" + this.chromedriverPath,
             "-Dwebdriver.gecko.driver=" + this.geckodriverPath,
@@ -43,13 +49,22 @@ class GridLauncher {
         this.nodes.push(child_process.spawn("java", args));
     }
 
+    /**
+     * Stop hub and nodes
+     */
     stop() {
-        this.nodes.forEach(node => node.kill());
+        if (this.nodes) {
+            this.nodes.forEach(node => node.kill());
+        }
         if (this.hub) {
             this.hub.kill();
         }
     }
 
+    /**
+     * Get driver binaries paths
+     * @private
+     */
     _getBinariesPath() {
         const CHROME_DRIVER_REGEXP = /^chromedriver_.+\.exe$/;
         const GECKO_DRIVER_REGEXP = /^geckodriver.+\.exe$/;
