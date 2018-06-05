@@ -40,7 +40,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         webdriverManagerArgs: ["--ie32", "--chrome"]
     }));
 
-    gulp.task("test", ["test:gherkin_precompile"], () => {
+    gulp.task("test", ["test:gherkin_precompile", "test:driver_update"], () => {
         const startTime = new Date();
         return gulp.src([])
             .pipe(protractor({
