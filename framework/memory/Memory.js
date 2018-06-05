@@ -45,17 +45,20 @@ class Memory {
      */
     static parseValue(key) {
         const MEMORY_REGEXP = /^(\$|#|!{1,2})?([^$#!]?.+)$/;
-        const [_, prefix, parsedKey] = key.match(MEMORY_REGEXP);
 
-        switch (prefix) {
-            case "$": return this._getMemoryValue(parsedKey);
-            case "#": return this._getCalculableValue(parsedKey);
-            case "!": return this._getConstantValue(parsedKey);
-            case "!!": return this._getFileConstantValue(parsedKey);
-            case undefined: return parsedKey;
-            default: throw new Error(`${parsedKey} is not defined`)
+        if (MEMORY_REGEXP.test(key)) {
+            const [_, prefix, parsedKey] = key.match(MEMORY_REGEXP);
+            switch (prefix) {
+                case "$": return this._getMemoryValue(parsedKey);
+                case "#": return this._getCalculableValue(parsedKey);
+                case "!": return this._getConstantValue(parsedKey);
+                case "!!": return this._getFileConstantValue(parsedKey);
+                case undefined: return parsedKey;
+                default: throw new Error(`${parsedKey} is not defined`)
+            }
+        } else {
+            return key
         }
-
     }
 
     /**
