@@ -10,8 +10,6 @@ const Reporter = require("../../framework/reporter/Reporter");
 const TasksKiller = require("../../framework/taskskiller/TasksKiller");
 const CredentialManager = require("../credential_manager/ServerCredentialManager");
 const GherkinPrecompiler = require("../gherkin_precompiler/GherkinPrecompiler");
-const GridLauncher = require("../grid_launcher/GridLauncher");
-const gridLauncher = new GridLauncher();
 
 module.exports = function (gulp, envs, credentialManagerClass = CredentialManager) {
 
@@ -42,7 +40,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         webdriverManagerArgs: ["--ie32", "--chrome"]
     }));
 
-    gulp.task("test", ["test:gherkin_precompile", "grid"], () => {
+    gulp.task("test", ["test:gherkin_precompile"], () => {
         const startTime = new Date();
         return gulp.src([])
             .pipe(protractor({
@@ -54,13 +52,11 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
             .on("end", function () {
                 writeDurationMetadata(startTime);
                 server.stop();
-                gridLauncher.stop();
                 console.log("E2E Testing complete");
             })
             .on("error", function (error) {
                 writeDurationMetadata(startTime);
                 server.stop();
-                gridLauncher.stop();
                 console.log("E2E Tests failed");
             });
     });
@@ -75,13 +71,6 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
 
     gulp.task("c_server", () => {
         server.run([__dirname + "/credential_server.js", "--credentialServerPort", yargs.argv.credentialServerPort || 3099]);
-    });
-
-    gulp.task("grid", ["test:driver_update"], () => {
-        if (yargs.argv.grid) {
-            gridLauncher.startHub();
-            gridLauncher.startNode();
-        }
     });
 
 };
