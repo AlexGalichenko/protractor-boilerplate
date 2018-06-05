@@ -40,7 +40,7 @@ class ServerCredentialManager {
             method: "GET",
             uri: SERVICE_URI,
         })
-        .then((body) => JSON.parse(body))
+        .then(body => JSON.parse(body))
         .catch(e => {
             throw e
         })
@@ -53,14 +53,16 @@ class ServerCredentialManager {
      */
     static freeCredentials() {
         return this.credentials.then(credentials => {
-            return request({
-                method: "PUT",
-                uri: SERVICE_URI,
-                body: {
-                    username: credentials.username
-                },
-                json: true
-            })
+            if (credentials) {
+                return request({
+                    method: "PUT",
+                    uri: SERVICE_URI,
+                    body: {
+                        username: credentials.username
+                    },
+                    json: true
+                })
+            }
         }).catch(e => {
             throw e
         })

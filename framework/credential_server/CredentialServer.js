@@ -17,7 +17,7 @@ class CredentialServer {
                 this.db.createPool(req.body);
                 res.sendStatus(201);
             } catch (e) {
-                res.status(500).send(e);
+                res.status(500).send(null);
             }
         });
 
@@ -26,7 +26,7 @@ class CredentialServer {
                 const user = this.db.getCredentials();
                 res.status(200).send(user);
             } catch (e) {
-                res.status(500).send(e);
+                res.status(500).send(null);
             }
         });
 
@@ -35,7 +35,7 @@ class CredentialServer {
                 this.db.freeCredentials(req.body.username);
                 res.sendStatus(200);
             } catch (e) {
-                res.status(500).send(e);
+                res.status(500).send(null);
             }
         });
 
