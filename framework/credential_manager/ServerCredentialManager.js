@@ -42,7 +42,7 @@ class ServerCredentialManager {
         })
         .then((body) => JSON.parse(body))
         .catch(e => {
-            throw new Error("Cannot get credentials")
+            throw e
         })
     }
 
@@ -62,7 +62,7 @@ class ServerCredentialManager {
                 json: true
             })
         }).catch(e => {
-            throw new Error("Cannot free credentials")
+            throw e
         })
     }
 

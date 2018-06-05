@@ -45,8 +45,6 @@ class CredentialDB {
 
         if (userIndex !== -1) {
             this.credentials[userIndex].isLocked = false;
-        } else {
-            throw new Error(`Username ${username} isn't found`)
         }
     }
 
