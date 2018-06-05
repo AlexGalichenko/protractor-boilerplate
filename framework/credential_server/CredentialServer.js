@@ -39,6 +39,14 @@ class CredentialServer {
             }
         });
 
+        this.server.get("/state", (req, res) => {
+            try {
+                res.status(200).send(this.db.credentials);
+            } catch (e) {
+                res.status(500).send(e);
+            }
+        });
+
     }
 
     /**

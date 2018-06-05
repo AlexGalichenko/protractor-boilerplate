@@ -13,8 +13,15 @@ class CredentialDB {
      * @param {Object} creds
      */
     createPool(creds) {
+        const FREE_USER_TIMEOUT = 10 * 60 * 1000;
+
         this.credentials = creds.map(item => {
             item.isLocked = false;
+            item.freeTimeout = function() {
+                setTimeout(() => {
+                    this.isLocked = false;
+                }, FREE_USER_TIMEOUT)
+            };
             return item
         });
     }
@@ -29,6 +36,7 @@ class CredentialDB {
 
         if (freeUserIndex !== -1) {
             this.credentials[freeUserIndex].isLocked = true;
+            this.credentials[freeUserIndex].freeTimeout();
             return this.credentials[freeUserIndex];
         } else {
             throw new Error("There are no free users")
