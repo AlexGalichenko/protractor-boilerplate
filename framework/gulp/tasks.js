@@ -67,6 +67,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         const metadata = Object.assign(require(path.resolve("./test/metadata.json")), require(path.resolve("./protractor.conf.js")).config.capabilities.metadata);
         Reporter.generateHTMLReport(metadata);
         Reporter.generateXMLReport("./test/report.json", "./test/report.xml");
+        Reporter.generateXLSXReport("./test/report.json", "./test/report.xlsx");
     });
 
     gulp.task("c_server", () => {
