@@ -110,7 +110,7 @@ class Reporter {
                 return data;
             });
 
-            xlsxReporter.createSheet(dataResult, outputPathXlsx);
+            xlsxReporter.createSheets(dataResult, outputPathXlsx);
         })
     }
 
