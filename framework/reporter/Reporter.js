@@ -4,6 +4,8 @@ const report = require("multiple-cucumber-html-reporter");
 const xml2js = require("xml2js");
 const JunitReport = require("./JunitReport");
 const os = require("os");
+const XlsxReporter = require("./XlsxReporter");
+const xlsxReporter = new XlsxReporter();
 
 /**
  * Reporter
@@ -78,6 +80,38 @@ class Reporter {
                 if (err) throw err
             })
         });
+    }
+
+    /**
+     * Generate xlsx report
+     * @param {string} pathToJson
+     * @param {string} outputPathXlsx
+     */
+    static generateXLSXReport(pathToJson, outputPathXlsx) {
+
+        this.glueReports(pathToJson, jsonReport => {
+
+            const dataResult = JSON.parse(jsonReport).map(json => {
+
+                const data = {
+                    "feature": "",
+                    "name": "",
+                    "tags": "",
+                    "status": "passed"
+                };
+
+                data.feature = json.name;
+                json.elements.map(e => {
+                    data.name = e.name;
+                    data.tags = e.tags.map(t => t.name).slice(0, -1).join(", ");
+                    data.status = e.steps.some(s => s.result.status === "failed") ? "failed" : data.status
+                });
+
+                return data;
+            });
+
+            xlsxReporter.createSheets(dataResult, outputPathXlsx);
+        })
     }
 
     /**
