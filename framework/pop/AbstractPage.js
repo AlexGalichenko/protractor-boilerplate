@@ -119,7 +119,7 @@ class AbstractPage {
             const elementsCollection = rootElement.all(this._getSelector(newComponent));
             if (parsedToken.hasTokenIn()) {
                 return elementsCollection
-                    .filter(elem => elem.getText().then(text => text === parsedToken.innerText || text.includes(parsedToken.innerText)))
+                    .filter(elem => elem.getText().then(text => text.includes(parsedToken.innerText)))
                     .first();
             } else if (parsedToken.hasTokenOf()) {
                 return elementsCollection.get(parsedToken.index - 1)
