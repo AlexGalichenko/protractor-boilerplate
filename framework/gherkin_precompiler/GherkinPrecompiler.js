@@ -91,14 +91,25 @@ class GherkinPrecompiler {
 
     /**
      * Split feature
-     * @param scenarios
-     * @param featureTemplate
-     * @return {wdpromise.Promise<any[]>}
+     * @param {Array} scenarios - list of scenarios
+     * @param {Object} featureTemplate - template of feature
+     * @return {Array} - list of features
      * @private
      */
     _splitFeature(scenarios, featureTemplate) {
-        return scenarios
+        const scenarioOutline = scenarios
             .filter(scenario => scenario.type !== "Background")
+            .map(scenario => {
+                if (scenario.type === "ScenarioOutline") {
+                    return scenario.examples[0].tableBody.map(row => {
+                        const scenarioTemplate = Object.assign({}, scenario);
+                        scenarioTemplate.examples[0].tableBody = [row];
+                        return scenarioTemplate;
+                    })
+                } else return scenario
+            });
+
+        return _.flatten(scenarioOutline)
             .map(scenario => {
                 const feature = Object.assign({}, featureTemplate);
                 feature.feature = Object.assign({}, featureTemplate.feature);
