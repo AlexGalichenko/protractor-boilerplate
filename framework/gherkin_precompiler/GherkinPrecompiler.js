@@ -101,10 +101,14 @@ class GherkinPrecompiler {
             .filter(scenario => scenario.type !== "Background")
             .map(scenario => {
                 if (scenario.type === "ScenarioOutline") {
+                    const scenarioTemplate = Object.assign({}, scenario);
                     return scenario.examples[0].tableBody.map(row => {
-                        const scenarioTemplate = Object.assign({}, scenario);
-                        scenarioTemplate.examples[0].tableBody = [row];
-                        return scenarioTemplate;
+                        const modifiedScenario = Object.assign({}, scenarioTemplate);
+                        modifiedScenario.examples = Object.assign({}, scenarioTemplate.examples);
+                        modifiedScenario.examples[0] = Object.assign({}, scenarioTemplate.examples[0]);
+                        modifiedScenario.examples[0].tableBody = Object.assign([], scenarioTemplate.examples[0].tableBody);
+                        modifiedScenario.examples[0].tableBody = [row];
+                        return modifiedScenario;
                     })
                 } else return scenario
             });
