@@ -24,4 +24,7 @@ module.exports.argv = require("yargs")
     })
     .option("debug", {
         describe: "debug",
+    })
+    .option("config", {
+        describe: "config file",
     });
