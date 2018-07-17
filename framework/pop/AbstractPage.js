@@ -50,18 +50,23 @@ class AbstractPage {
 
     /**
      * Define component on page
-     * @param {string} alias - alias
-     * @param {Component} component - component
+     * @param {string|Component} aliasOrComponent - alias or component
+     * @param {Component} [component] - component
      * @example
      * class Page extends AbstractPage {
      *   constructor() {
      *     super();
      *     this.defineComponent("YourComponent", new CustomComponent());
+     *     this.defineComponent(new CustomComponent());
      *   }
      * }
      */
-    defineComponent(alias, component) {
-        this.elements.set(alias, component);
+    defineComponent(aliasOrComponent, component) {
+        if (aliasOrComponent.alias) {
+            this.elements.set(aliasOrComponent.alias, aliasOrComponent);
+        } else {
+            this.elements.set(aliasOrComponent, component);
+        }
     }
 
     /**
