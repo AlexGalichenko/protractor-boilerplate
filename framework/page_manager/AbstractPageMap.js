@@ -15,7 +15,7 @@ class AbstractPageMap {
      * Define page by page selector
      * @param {string} alias - alias of page
      * @param {string|RegExp} selector - regexp selector of page
-     * @param {AbstractPage} pageObject - constructed page
+     * @param {AbstractPage|Object} pageObject - constructed page
      * @example
      * class PageMap extends AbstractPageMap {
      *   constructor() {

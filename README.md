@@ -13,7 +13,7 @@ class PageMap extends AbstractPageMap {
     constructor() {
         super();
 
-        this.definePage("Login", "^.+))$", LoginPage);
+        this.definePage("Login", "^.+))$", new LoginPage());
 
     }
 
@@ -115,21 +115,29 @@ class CustomComponent extends Component {
      
 # Memory
 ##Memory
-
+Add value to memory
 ```javascript
 const Memory = require("protractor-boilerplate").Memory;
 
 defineSupportCode(({setDefaultTimeout, When}) => {
 
-    When(/^I remember "(.+)" value as "(.+)"$/, (alias, key) => {
+    When(/^I remember "(.+)" value as "(.+)"$/, async (alias, key) => {
         const page = State.getPage();
 
-        return page.getElement(alias).getText()
-            .then((text) => {
-                Memory.setValue(key, text);
-            })
+        const text = await page.getElement(alias).getText();
+        Memory.setValue(key, text);
     });
 }
+```
+Read value from memory
+```javascript
+const Memory = require("protractor-boilerplate").Memory;
+
+Memory.parseValue("$yourSavedValue"); //read saved value
+Memory.parseValue("!yourConstant"); //read constant value
+Memory.parseValue("!!yourFileConstant"); //read file constant value
+Memory.parseValue("#yourCalculableValue"); //read calculable value
+
 ```
 
 ###Methods
