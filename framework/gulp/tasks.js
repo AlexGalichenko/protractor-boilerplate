@@ -33,7 +33,9 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     });
 
     gulp.task("test:create_pool", ["folders:create", "c_server"], () => {
-        return credentialManagerClass.createPool(envs[yargs.argv.env].credentials)
+        if (yargs.argv.credentialServerPort) {
+            return credentialManagerClass.createPool(envs[yargs.argv.env].credentials)
+        }
     });
 
     gulp.task("test:driver_update", webdriver_update_specific({
