@@ -1,5 +1,5 @@
 const gulp = require("gulp");
-const fs = require("fs");
+const fs = require("fs-extra");
 const path = require("path");
 const {parseGulpArgs, writeDurationMetadata} = require("../helpers/utils");
 const yargs = require("../helpers/yargs").argv;
@@ -14,19 +14,18 @@ const GherkinPrecompiler = require("../gherkin_precompiler/GherkinPrecompiler");
 module.exports = function (gulp, envs, credentialManagerClass = CredentialManager) {
 
     gulp.task("folders:clean", () => {
-        return gulp.src("test", {read: false})
+        return gulp.src("dist", {read: false})
             .pipe(clean());
     });
 
     gulp.task("folders:create", ["folders:clean"], () => {
-        if (!fs.existsSync("./test")) {
-            fs.mkdirSync("./test");
-            fs.mkdirSync("./test/temp_features");
-        }
+        fs.mkdirsSync("./dist/temp_features");
     });
 
     gulp.task("test:gherkin_precompile", ["test:create_pool"], () => {
-        const config = yargs.argv.config ? require(yargs.argv.config).config : require("./protractor.conf.js").config;
+        const config = yargs.argv.config
+            ? require(path.resolve(yargs.argv.config)).config
+            : require(path.resolve("./protractor.conf.js")).config;
         return new GherkinPrecompiler(config.specs, yargs.argv.tags).compile().catch(e => {
             throw e
         });
