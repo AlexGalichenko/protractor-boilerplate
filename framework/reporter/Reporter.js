@@ -14,10 +14,10 @@ class Reporter {
     /**
      * Generate multiple html cucumber report
      * @param {Object} capabilities - browser capabilities
-     * @param {string} [reportPath] - path to store generated report
-     * @param {string} [jsonDir] - path to jsonDir
+     * @param {string} reportPath - path to store generated report
+     * @param {string} jsonDir - path to jsonDir
      */
-    static generateHTMLReport(capabilities, reportPath = "./test/", jsonDir = "./test/") {
+    static generateHTMLReport(capabilities, reportPath, jsonDir) {
 
         const GLUED_REPORT_PATH = "glued_report/";
 

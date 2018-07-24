@@ -1,5 +1,5 @@
 const gulp = require("gulp");
-const fs = require("fs");
+const fs = require("fs-extra");
 const path = require("path");
 const {parseGulpArgs, writeDurationMetadata} = require("../helpers/utils");
 const yargs = require("../helpers/yargs").argv;
@@ -14,26 +14,27 @@ const GherkinPrecompiler = require("../gherkin_precompiler/GherkinPrecompiler");
 module.exports = function (gulp, envs, credentialManagerClass = CredentialManager) {
 
     gulp.task("folders:clean", () => {
-        return gulp.src("test", {read: false})
+        return gulp.src("dist", {read: false})
             .pipe(clean());
     });
 
     gulp.task("folders:create", ["folders:clean"], () => {
-        if (!fs.existsSync("./test")) {
-            fs.mkdirSync("./test");
-            fs.mkdirSync("./test/temp_features");
-        }
+        fs.mkdirsSync("./dist/temp_features");
     });
 
     gulp.task("test:gherkin_precompile", ["test:create_pool"], () => {
-        const config = require(path.resolve("./protractor.conf.js")).config;
+        const config = yargs.argv.config
+            ? require(path.resolve(yargs.argv.config)).config
+            : require(path.resolve("./protractor.conf.js")).config;
         return new GherkinPrecompiler(config.specs, yargs.argv.tags).compile().catch(e => {
             throw e
         });
     });
 
     gulp.task("test:create_pool", ["folders:create", "c_server"], () => {
-        return credentialManagerClass.createPool(envs[yargs.argv.env].credentials)
+        if (yargs.argv.credentialServerPort) {
+            return credentialManagerClass.createPool(envs[yargs.argv.env].credentials)
+        }
     });
 
     gulp.task("test:driver_update", webdriver_update_specific({
@@ -44,7 +45,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         const startTime = new Date();
         return gulp.src([])
             .pipe(protractor({
-                configFile: path.resolve("./protractor.conf.js"),
+                configFile: yargs.argv.config ? path.resolve(yargs.argv.config) : path.resolve("./protractor.conf.js"),
                 args: parseGulpArgs(yargs.argv),
                 autoStartStopServer: true,
                 debug: yargs.debug === "true"
@@ -63,14 +64,10 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
 
     gulp.task("kill", () => TasksKiller.kill(["chromedriver", "iedriverserver"]));
 
-    gulp.task("report", () => {
-        const metadata = Object.assign(require(path.resolve("./test/metadata.json")), require(path.resolve("./protractor.conf.js")).config.capabilities.metadata);
-        Reporter.generateHTMLReport(metadata);
-        Reporter.generateXMLReport("./test/report.json", "./test/report.xml");
-    });
-
     gulp.task("c_server", () => {
-        server.run([__dirname + "/credential_server.js", "--credentialServerPort", yargs.argv.credentialServerPort || 3099]);
+        if (yargs.argv.credentialServerPort) {
+            server.run([__dirname + "/credential_server.js", "--credentialServerPort", yargs.argv.credentialServerPort]);
+        }
     });
 
 };
