@@ -15,7 +15,7 @@ class GherkinPrecompiler {
      * @param {string} tagExpression - tag expression to parse
      * @param {string} tempFolder - path to temp folder
      */
-    constructor(specs, tagExpression = "", tempFolder = "./test/temp_features/") {
+    constructor(specs, tagExpression = "", tempFolder = "./dist/temp_features/") {
         this.specs = specs;
         this.tagExpression = tagExpression;
         this.tempFolder = tempFolder;
