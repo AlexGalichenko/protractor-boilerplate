@@ -26,7 +26,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     });
 
     gulp.task("test:gherkin_precompile", ["test:create_pool"], () => {
-        const config = require(path.resolve("./protractor.conf.js")).config;
+        const config = yargs.argv.config ? require(yargs.argv.config).config : require("./protractor.conf.js").config;
         return new GherkinPrecompiler(config.specs, yargs.argv.tags).compile().catch(e => {
             throw e
         });
@@ -44,7 +44,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         const startTime = new Date();
         return gulp.src([])
             .pipe(protractor({
-                configFile: path.resolve("./protractor.conf.js"),
+                configFile: yargs.argv.config ? path.resolve(yargs.argv.config) : path.resolve("./protractor.conf.js"),
                 args: parseGulpArgs(yargs.argv),
                 autoStartStopServer: true,
                 debug: yargs.debug === "true"
@@ -63,14 +63,10 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
 
     gulp.task("kill", () => TasksKiller.kill(["chromedriver", "iedriverserver"]));
 
-    gulp.task("report", () => {
-        const metadata = Object.assign(require(path.resolve("./test/metadata.json")), require(path.resolve("./protractor.conf.js")).config.capabilities.metadata);
-        Reporter.generateHTMLReport(metadata);
-        Reporter.generateXMLReport("./test/report.json", "./test/report.xml");
-    });
-
     gulp.task("c_server", () => {
-        server.run([__dirname + "/credential_server.js", "--credentialServerPort", yargs.argv.credentialServerPort || 3099]);
+        if (yargs.argv.credentialServerPort) {
+            server.run([__dirname + "/credential_server.js", "--credentialServerPort", yargs.argv.credentialServerPort]);
+        }
     });
 
 };
