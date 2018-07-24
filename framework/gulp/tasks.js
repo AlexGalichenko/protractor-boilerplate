@@ -1,7 +1,7 @@
 const gulp = require("gulp");
 const fs = require("fs-extra");
 const path = require("path");
-const {parseGulpArgs, writeDurationMetadata} = require("../helpers/utils");
+const {parseGulpArgs} = require("../helpers/utils");
 const yargs = require("../helpers/yargs").argv;
 const clean = require("gulp-clean");
 const {protractor, webdriver_update_specific} = require("gulp-protractor");
@@ -13,12 +13,8 @@ const GherkinPrecompiler = require("../gherkin_precompiler/GherkinPrecompiler");
 
 module.exports = function (gulp, envs, credentialManagerClass = CredentialManager) {
 
-    gulp.task("folders:clean", () => {
-        return gulp.src("dist", {read: false})
-            .pipe(clean());
-    });
-
-    gulp.task("folders:create", ["folders:clean"], () => {
+    gulp.task("folders:create", () => {
+        fs.emptyDirSync("./dist");
         fs.mkdirsSync("./dist/temp_features");
     });
 
@@ -42,7 +38,9 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     }));
 
     gulp.task("test", ["test:gherkin_precompile", "test:driver_update"], () => {
-        const startTime = new Date();
+        const config = yargs.argv.config
+            ? require(path.resolve(yargs.argv.config)).config
+            : require(path.resolve("./protractor.conf.js")).config;
         return gulp.src([])
             .pipe(protractor({
                 configFile: yargs.argv.config ? path.resolve(yargs.argv.config) : path.resolve("./protractor.conf.js"),
@@ -51,13 +49,29 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
                 debug: yargs.debug === "true"
             }))
             .on("end", function () {
-                writeDurationMetadata(startTime);
                 server.stop();
                 console.log("E2E Testing complete");
+                Reporter.generateHTMLReport(
+                    config.capabilities.metadata,
+                    config.boilerplateOpts.reportFolder,
+                    config.boilerplateOpts.reportFolder
+                );
+                Reporter.generateXMLReport(
+                    config.boilerplateOpts.reportFolder + "report.json",
+                    config.boilerplateOpts.reportFolder + "report.xml"
+                );
             })
             .on("error", function (error) {
-                writeDurationMetadata(startTime);
                 server.stop();
+                Reporter.generateHTMLReport(
+                    config.capabilities.metadata,
+                    config.boilerplateOpts.reportFolder,
+                    config.boilerplateOpts.reportFolder
+                );
+                Reporter.generateXMLReport(
+                    config.boilerplateOpts.reportFolder + "report.json",
+                    config.boilerplateOpts.reportFolder + "report.xml"
+                );
                 console.log("E2E Tests failed");
             });
     });
