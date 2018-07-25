@@ -27,4 +27,7 @@ module.exports.argv = require("yargs")
     })
     .option("config", {
         describe: "config file",
+    })
+    .option("seleniumPort", {
+        describe: "port for selenium server",
     });
