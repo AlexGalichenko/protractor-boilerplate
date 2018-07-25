@@ -118,14 +118,20 @@ class AbstractPage {
      * @private
      */
     _getElementOfCollection(currentProtractorElement, currentComponent, parsedToken) {
+        const ROOT_ELEMENT_SELECTOR = by.css("html");
         const newComponent = this._newComponentCreator(currentComponent, parsedToken.alias);
-        const rootElement = currentProtractorElement ? currentProtractorElement : element(by.css("html"));
+        const rootElement = currentProtractorElement ? currentProtractorElement : element(ROOT_ELEMENT_SELECTOR);
         if (newComponent.isCollection) {
             const elementsCollection = rootElement.all(this._getSelector(newComponent));
             if (parsedToken.hasTokenIn()) {
-                return elementsCollection
-                    .filter(elem => elem.getText().then(text => text.includes(parsedToken.innerText)))
-                    .first();
+                const locator = elementsCollection.locator();
+                if (this._isLocatorTranformable(locator)) {
+                    return rootElement.element(this._transformLocatorByText(locator, parsedToken.innerText))
+                } else {
+                    return elementsCollection
+                        .filter(elem => elem.getText().then(text => text.includes(parsedToken.innerText)))
+                        .first();
+                }
             } else if (parsedToken.hasTokenOf()) {
                 return elementsCollection.get(parsedToken.index - 1)
             }
@@ -189,6 +195,32 @@ class AbstractPage {
                 }
             } break;
             default: throw new Error(`Selector type ${element.selectorType} is not defined`);
+        }
+    }
+
+    /**
+     * Verify if locator hack can be applied
+     * @param locator - locator of element
+     * @return {boolean}
+     * @private
+     */
+    _isLocatorTranformable(locator) {
+        switch (locator.using) {
+            case "css selector": return true; break;
+            default: return false
+        }
+    }
+
+    /**
+     * Transform locator for text selection
+     * @param locator - locator
+     * @param text - text
+     * @return {ProtractorLocator}
+     * @private
+     */
+    _transformLocatorByText(locator, text) {
+        switch (locator.using) {
+            case "css selector": return by.cssContainingText(locator.value, text); break;
         }
     }
 
