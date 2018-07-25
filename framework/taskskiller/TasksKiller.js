@@ -21,7 +21,7 @@ class TaskKiller {
 
                 stdout
                     .split("\r\n")
-                    .find(process => itemToKill.find(item => process.includes(item)))
+                    .filter(process => itemToKill.find(item => process.includes(item)))
                     .map(item => item.split(/,/)[1].replace(/"/g, ""))
                     .forEach(pid => exec(KILL + pid, error => {
                         if (error) reject(error);
