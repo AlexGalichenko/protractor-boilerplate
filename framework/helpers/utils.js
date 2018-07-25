@@ -50,7 +50,7 @@ function prepareFolders() {
 /**
  * Parse gulp args
  * @private
- * @param {{env, tags, browser, i, baseUrl}} env 
+ * @param {{env, tags, browser, i, baseUrl}} env
  * @return {Array} array of args
  */
 function parseGulpArgs(env) {
@@ -60,6 +60,10 @@ function parseGulpArgs(env) {
         "--cucumberOpts.tags", env.tags,
         "--capabilities.browserName", env.browser || "chrome",
     ];
+
+    if (env.seleniumPort) {
+        args.push("--seleniumPort", env.seleniumPort);
+    }
 
     if (env.i > 1) {
         args.push("--capabilities.shardTestFiles");
