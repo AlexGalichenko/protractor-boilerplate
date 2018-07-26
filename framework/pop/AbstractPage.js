@@ -126,7 +126,7 @@ class AbstractPage {
             if (parsedToken.hasTokenIn()) {
                 const locator = elementsCollection.locator();
                 if (this._isLocatorTranformable(locator)) {
-                    return rootElement.element(this._transformLocatorByText(locator, parsedToken.innerText))
+                    return rootElement.all(this._transformLocatorByText(locator, parsedToken.innerText)).first()
                 } else {
                     return elementsCollection
                         .filter(elem => elem.getText().then(text => text.includes(parsedToken.innerText)))

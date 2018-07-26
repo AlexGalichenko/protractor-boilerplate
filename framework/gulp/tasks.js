@@ -12,11 +12,11 @@ const CredentialManager = require("../credential_manager/ServerCredentialManager
 const GherkinPrecompiler = require("../gherkin_precompiler/GherkinPrecompiler");
 const child_process = require("child_process");
 
-function getProtractorBinary(binaryName){
-    const pkgPath = require.resolve('protractor');
-    const protractorDir = path.resolve(path.join(path.dirname(pkgPath), '..', 'bin'));
-    return path.join(protractorDir, '/' + binaryName);
-}
+// function getProtractorBinary(binaryName){
+//     const pkgPath = require.resolve('protractor');
+//     const protractorDir = path.resolve(path.join(path.dirname(pkgPath), '..', 'bin'));
+//     return path.join(protractorDir, '/' + binaryName);
+// }
 
 module.exports = function (gulp, envs, credentialManagerClass = CredentialManager) {
 
@@ -45,16 +45,16 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     }));
 
 
-    gulp.task("test:webdriver:start", ["test:driver_update"], () => {
-        const config = yargs.argv.config
-            ? require(path.resolve(yargs.argv.config)).config
-            : require(path.resolve("./protractor.conf.js")).config;
-        child_process.spawn("node", [getProtractorBinary("webdriver-manager"), "start", "--seleniumPort", config.seleniumPort || yargs.argv.seleniumPort || 4444], {
-            stdio: "ignore"
-        });
-    });
+    // gulp.task("test:webdriver:start", ["test:driver_update"], () => {
+    //     const config = yargs.argv.config
+    //         ? require(path.resolve(yargs.argv.config)).config
+    //         : require(path.resolve("./protractor.conf.js")).config;
+    //     child_process.spawn("node", [getProtractorBinary("webdriver-manager"), "start", "--seleniumPort", config.seleniumPort || yargs.argv.seleniumPort || 4444], {
+    //         stdio: "ignore"
+    //     });
+    // });
 
-    gulp.task("test", ["test:gherkin_precompile", "test:webdriver:start"], () => {
+    gulp.task("test", ["test:gherkin_precompile", "test:driver_update"], () => {
         const config = yargs.argv.config
             ? require(path.resolve(yargs.argv.config)).config
             : require(path.resolve("./protractor.conf.js")).config;
@@ -67,7 +67,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
             }))
             .on("end", function () {
                 server.stop();
-                TasksKiller.killWebdriver(config.seleniumPort || yargs.argv.seleniumPort || 4444);
+                // TasksKiller.killWebdriver(config.seleniumPort || yargs.argv.seleniumPort || 4444);
                 console.log("E2E Testing complete");
                 Reporter.generateHTMLReport(
                     config.capabilities.metadata,
@@ -90,7 +90,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
                     config.boilerplateOpts.reportFolder + "report.json",
                     config.boilerplateOpts.reportFolder + "report.xml"
                 );
-                TasksKiller.killWebdriver(config.seleniumPort || yargs.argv.seleniumPort || 4444);
+                // TasksKiller.killWebdriver(config.seleniumPort || yargs.argv.seleniumPort || 4444);
                 console.log("E2E Tests failed");
             });
     });
