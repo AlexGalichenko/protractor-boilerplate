@@ -68,6 +68,51 @@ class ServerCredentialManager {
         })
     }
 
+    /**
+     * Free credentials
+     * @param property - property to update
+     * @param value - value to update
+     * @throws {Error}
+     * @example CredentialManager.updateProperty("cookie", "myCookie");
+     */
+    static updateProperty(property, value) {
+        return this.credentials.then(credentials => {
+            if (credentials) {
+                return request({
+                    method: "PUT",
+                    uri: SERVICE_URI + "/update",
+                    body: {
+                        username: credentials.username,
+                        property: property,
+                        value: value
+                    },
+                    json: true
+                })
+            }
+        }).catch(e => {
+            throw e
+        })
+    }
+
+    /**
+     * Return specified credentials by username
+     * @param username - username to get
+     * @return {Promise<Object>} - promise that resolves with set of credentials
+     * @throws {Error}
+     * @example
+     * CredentialManager.getCredentialsByUsername(ta1@email.com);
+     * const currentCredentials = await CredentialManager.credentials;
+     */
+    static getCredentialsByUsername(username) {
+        this.credentials = request({
+            method: "GET",
+            uri: SERVICE_URI + "/" + username,
+        })
+        .then(body => JSON.parse(body))
+        .catch(e => {
+            throw e
+        })
+    }
 
 }
 

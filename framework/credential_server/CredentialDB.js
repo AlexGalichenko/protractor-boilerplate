@@ -39,20 +39,54 @@ class CredentialDB {
             this.credentials[freeUserIndex].freeTimeout();
             return this.credentials[freeUserIndex];
         } else {
-            throw new Error("There are no free users")
+            throw new Error("There are no free users");
         }
     }
 
     /**
      * Free credentials by username
      * @param {string} username - username to free
-     * @throws {Error}
      */
     freeCredentials(username) {
         const userIndex = this.credentials.findIndex(item => item.username === username);
 
         if (userIndex !== -1) {
             this.credentials[userIndex].isLocked = false;
+        }
+    }
+
+    /**
+     * Update property
+     * @param {string} username - username to update
+     * @param {string} property - property to update
+     * @param {any} value - value of property
+     * @throws {Error}
+     */
+    updateProperty(username, property, value) {
+        const userIndex = this.credentials.findIndex(item => item.username === username);
+
+        if (userIndex !== -1) {
+            this.credentials[userIndex][property] = value;
+        } else {
+            throw new Error("User with " + username + " is not found");
+        }
+    }
+
+    /**
+     * Get credentials by username
+     * @param username - username to search for user
+     * @return {Object}
+     * @throws {Error}
+     */
+    getCredentialsByUsername(username) {
+        const freeUserIndex = this.credentials.findIndex(item => item.username === username);
+
+        if (freeUserIndex !== -1) {
+            this.credentials[freeUserIndex].isLocked = true;
+            this.credentials[freeUserIndex].freeTimeout();
+            return this.credentials[freeUserIndex];
+        } else {
+            throw new Error("There are no users with username: " + username);
         }
     }
 

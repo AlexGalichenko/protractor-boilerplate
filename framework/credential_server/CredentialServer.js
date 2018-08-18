@@ -30,9 +30,27 @@ class CredentialServer {
             }
         });
 
+        this.server.get("/credentials/:username", (req, res) => {
+            try {
+                const user = this.db.getCredentialsByUsername(req.params.username);
+                res.status(200).send(user);
+            } catch (e) {
+                res.status(500).send(null);
+            }
+        });
+
         this.server.put("/credentials", (req, res) => {
             try {
                 this.db.freeCredentials(req.body.username);
+                res.sendStatus(200);
+            } catch (e) {
+                res.status(500).send(null);
+            }
+        });
+
+        this.server.put("/credentials/update", (req, res) => {
+            try {
+                this.db.updateProperty(req.body.username, req.body.property, req.body.value);
                 res.sendStatus(200);
             } catch (e) {
                 res.status(500).send(null);
