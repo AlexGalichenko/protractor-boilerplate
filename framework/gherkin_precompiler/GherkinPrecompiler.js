@@ -3,7 +3,6 @@ const fs = require("fs");
 const glob = require("glob");
 const parser = new (require("cucumber-tag-expressions").TagExpressionParser)();
 const path = require("path");
-const protractorConf = require(path.resolve("./protractor.conf.js"));
 const util = require("util");
 const _ = require("lodash");
 

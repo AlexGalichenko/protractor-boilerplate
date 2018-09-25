@@ -97,6 +97,21 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
 
     gulp.task("kill", () => TasksKiller.kill(["chromedriver", "iedriverserver"]));
 
+    gulp.task("report", () => {
+        const config = yargs.argv.config
+            ? require(path.resolve(yargs.argv.config)).config
+            : require(path.resolve("./protractor.conf.js")).config;
+        Reporter.generateHTMLReport(
+            config.capabilities.metadata,
+            config.boilerplateOpts.reportFolder,
+            config.boilerplateOpts.reportFolder
+        );
+        Reporter.generateXMLReport(
+            config.boilerplateOpts.reportFolder + "report.json",
+            config.boilerplateOpts.reportFolder + "report.xml"
+        );
+    });
+
     gulp.task("c_server", () => {
         if (yargs.argv.credentialServerPort) {
             server.run([__dirname + "/credential_server.js", "--credentialServerPort", yargs.argv.credentialServerPort]);
