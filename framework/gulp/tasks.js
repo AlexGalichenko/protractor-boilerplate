@@ -40,21 +40,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         }
     });
 
-    gulp.task("test:driver_update", webdriver_update_specific({
-        webdriverManagerArgs: ["--ie32", "--chrome", "--ignore_ssl"]
-    }));
-
-
-    // gulp.task("test:webdriver:start", ["test:driver_update"], () => {
-    //     const config = yargs.argv.config
-    //         ? require(path.resolve(yargs.argv.config)).config
-    //         : require(path.resolve("./protractor.conf.js")).config;
-    //     child_process.spawn("node", [getProtractorBinary("webdriver-manager"), "start", "--seleniumPort", config.seleniumPort || yargs.argv.seleniumPort || 4444], {
-    //         stdio: "ignore"
-    //     });
-    // });
-
-    gulp.task("test", ["test:gherkin_precompile", "test:driver_update"], () => {
+    gulp.task("test", ["test:gherkin_precompile"], () => {
         const config = yargs.argv.config
             ? require(path.resolve(yargs.argv.config)).config
             : require(path.resolve("./protractor.conf.js")).config;
