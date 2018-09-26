@@ -41,7 +41,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     });
 
     gulp.task("test:driver_update", webdriver_update_specific({
-        webdriverManagerArgs: ["--ie32", "--chrome"]
+        webdriverManagerArgs: ["--ie32", "--chrome", "--ignore_ssl"]
     }));
 
 
