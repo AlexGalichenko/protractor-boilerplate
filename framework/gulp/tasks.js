@@ -4,19 +4,14 @@ const path = require("path");
 const {parseGulpArgs} = require("../helpers/utils");
 const yargs = require("../helpers/yargs").argv;
 const clean = require("gulp-clean");
-const {protractor, webdriver_update_specific} = require("gulp-protractor");
+const {protractor} = require("gulp-protractor");
 const server = require("gulp-express");
 const Reporter = require("../../framework/reporter/Reporter");
 const TasksKiller = require("../../framework/taskskiller/TasksKiller");
 const CredentialManager = require("../credential_manager/ServerCredentialManager");
 const GherkinPrecompiler = require("../gherkin_precompiler/GherkinPrecompiler");
 const child_process = require("child_process");
-
-// function getProtractorBinary(binaryName){
-//     const pkgPath = require.resolve('protractor');
-//     const protractorDir = path.resolve(path.join(path.dirname(pkgPath), '..', 'bin'));
-//     return path.join(protractorDir, '/' + binaryName);
-// }
+const {update} = require("webdriver-manager-replacement");
 
 module.exports = function (gulp, envs, credentialManagerClass = CredentialManager) {
 
@@ -25,10 +20,25 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         fs.mkdirsSync("./dist/temp_features");
     });
 
-    gulp.task("test:gherkin_precompile", ["test:create_pool"], () => {
-        const config = yargs.argv.config
-            ? require(path.resolve(yargs.argv.config)).config
-            : require(path.resolve("./protractor.conf.js")).config;
+    gulp.task("webdriver:update", () => {
+        const browserDrivers = [
+            {
+                name: "chromedriver"
+            }
+        ];
+        const server = {
+            name: "selenium",
+            runAsNode: false,
+            runAsDetach: true,
+        };
+        return update({
+            browserDrivers,
+            server
+        });
+    });
+
+    gulp.task("test:gherkin_precompile", ["test:create_pool", "webdriver:update"], () => {
+        const config = getConfig();
         return new GherkinPrecompiler(config.specs, yargs.argv.tags).compile().catch(e => {
             throw e
         });
@@ -41,61 +51,33 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     });
 
     gulp.task("test", ["test:gherkin_precompile"], () => {
-        const config = yargs.argv.config
-            ? require(path.resolve(yargs.argv.config)).config
-            : require(path.resolve("./protractor.conf.js")).config;
+        const config = getConfig();
         return gulp.src([])
             .pipe(protractor({
-                configFile: yargs.argv.config ? path.resolve(yargs.argv.config) : path.resolve("./protractor.conf.js"),
+                configFile: getConfigFile(),
                 args: parseGulpArgs(yargs.argv),
                 autoStartStopServer: true,
                 debug: yargs.debug === "true"
             }))
             .on("end", function () {
                 server.stop();
-                // TasksKiller.killWebdriver(config.seleniumPort || yargs.argv.seleniumPort || 4444);
                 console.log("E2E Testing complete");
-                Reporter.generateHTMLReport(
-                    config.capabilities.metadata,
-                    config.boilerplateOpts.reportFolder,
-                    config.boilerplateOpts.reportFolder
-                );
-                Reporter.generateXMLReport(
-                    config.boilerplateOpts.reportFolder + "report.json",
-                    config.boilerplateOpts.reportFolder + "report.xml"
-                );
+                generateReport(config);
+                process.exit();
             })
             .on("error", function (error) {
                 server.stop();
-                Reporter.generateHTMLReport(
-                    config.capabilities.metadata,
-                    config.boilerplateOpts.reportFolder,
-                    config.boilerplateOpts.reportFolder
-                );
-                Reporter.generateXMLReport(
-                    config.boilerplateOpts.reportFolder + "report.json",
-                    config.boilerplateOpts.reportFolder + "report.xml"
-                );
-                // TasksKiller.killWebdriver(config.seleniumPort || yargs.argv.seleniumPort || 4444);
+                generateReport(config);
                 console.log("E2E Tests failed");
-            });
+                process.exit();
+            })
     });
 
     gulp.task("kill", () => TasksKiller.kill(["chromedriver", "iedriverserver"]));
 
     gulp.task("report", () => {
-        const config = yargs.argv.config
-            ? require(path.resolve(yargs.argv.config)).config
-            : require(path.resolve("./protractor.conf.js")).config;
-        Reporter.generateHTMLReport(
-            config.capabilities.metadata,
-            config.boilerplateOpts.reportFolder,
-            config.boilerplateOpts.reportFolder
-        );
-        Reporter.generateXMLReport(
-            config.boilerplateOpts.reportFolder + "report.json",
-            config.boilerplateOpts.reportFolder + "report.xml"
-        );
+        const config = getConfig();
+        generateReport(config);
     });
 
     gulp.task("c_server", () => {
@@ -105,3 +87,27 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     });
 
 };
+
+function generateReport(config) {
+    Reporter.generateHTMLReport(
+        config.capabilities.metadata,
+        config.boilerplateOpts.reportFolder,
+        config.boilerplateOpts.reportFolder
+    );
+    Reporter.generateXMLReport(
+        config.boilerplateOpts.reportFolder + "report.json",
+        config.boilerplateOpts.reportFolder + "report.xml"
+    );
+}
+
+function getConfig() {
+    return yargs.argv.config
+        ? require(path.resolve(yargs.argv.config)).config
+        : require(path.resolve("./protractor.conf.js")).config
+}
+
+function getConfigFile() {
+    return yargs.argv.config
+        ? path.resolve(yargs.argv.config)
+        : path.resolve("./protractor.conf.js")
+}
