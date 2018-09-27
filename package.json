@@ -1,6 +1,6 @@
 {
   "name": "protractor-cucumber-boilerplate",
-  "version": "0.10.3",
+  "version": "0.10.4",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AlexGalichenko/protractor-boilerplate.git"
@@ -36,6 +36,7 @@
     "protractor-cucumber-framework": "^6.0.0",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
+    "webdriver-manager-replacement": "^1.1.0",
     "xml2js": "^0.4.19",
     "yargs": "^11.0.0"
   },
