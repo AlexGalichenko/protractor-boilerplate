@@ -1,6 +1,6 @@
 {
   "name": "protractor-cucumber-boilerplate",
-  "version": "0.10.4",
+  "version": "0.10.5",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AlexGalichenko/protractor-boilerplate.git"
@@ -18,6 +18,9 @@
     "Volha Shut",
     "Dzianis Patsyna"
   ],
+  "bin": {
+    "protractor-cucumber-boilerplate": "./bin/protractor-cucumber-boilerplate"
+  },
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.2",
