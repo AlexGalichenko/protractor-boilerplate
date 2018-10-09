@@ -24,6 +24,9 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         const browserDrivers = [
             {
                 name: "chromedriver"
+            },
+            {
+                name: "iedriver"
             }
         ];
         const server = {
@@ -63,13 +66,11 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
                 server.stop();
                 console.log("E2E Testing complete");
                 generateReport(config);
-                process.exit();
             })
             .on("error", function (error) {
                 server.stop();
                 generateReport(config);
                 console.log("E2E Tests failed");
-                process.exit();
             })
     });
 
