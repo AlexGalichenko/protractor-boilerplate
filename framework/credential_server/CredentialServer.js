@@ -14,7 +14,7 @@ class CredentialServer {
 
         this.server.post("/credentials", (req, res) => {
             try {
-                this.db.createPool(req.body.creds, req.query.pool);
+                this.db.createPool(req.body, req.query.pool);
                 res.sendStatus(201);
             } catch (e) {
                 res.status(500).send(null);
