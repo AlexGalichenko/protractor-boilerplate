@@ -40,20 +40,14 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         });
     });
 
-    gulp.task("test:gherkin_precompile", ["test:create_pool", "webdriver:update"], () => {
+    gulp.task("test:gherkin_precompile", ["webdriver:update", "folders:create"], () => {
         const config = getConfig();
         return new GherkinPrecompiler(config.specs, yargs.argv.tags).compile().catch(e => {
             throw e
         });
     });
 
-    gulp.task("test:create_pool", ["folders:create", "c_server"], () => {
-        if (yargs.argv.credentialServerPort) {
-            return credentialManagerClass.createPool(envs[yargs.argv.env].credentials)
-        }
-    });
-
-    gulp.task("test", ["test:gherkin_precompile"], () => {
+    gulp.task("test", ["test:gherkin_precompile", "c_server"], () => {
         const config = getConfig();
         return gulp.src([])
             .pipe(protractor({

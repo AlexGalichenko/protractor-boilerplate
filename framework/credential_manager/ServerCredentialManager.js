@@ -12,13 +12,19 @@ class ServerCredentialManager {
     /**
      * Create pool of userIds based on creds object
      * @param {Object} creds - set of user credentials
+     * @param {string} [pool] - name of pool
      * @throws {Error}
      * @example CredentialManager.createPool(credentials);
      */
-    static createPool(creds) {
+    static createPool(creds, pool) {
+        let requestURI = SERVICE_URI;
+        if (pool) {
+            requestURI += "?pool=" + pool;
+        }
+
         return request({
             method: "POST",
-            uri: SERVICE_URI,
+            uri: requestURI,
             body: creds,
             json: true
         })
@@ -31,14 +37,19 @@ class ServerCredentialManager {
      * Return free credentials from pool
      * @return {Promise<Object>} - promise that resolves with set of credentials
      * @throws {Error}
-     * @example 
+     * @example
      * CredentialManager.getCredentials();
      * const currentCredentials = await CredentialManager.credentials;
      */
-    static getCredentials() {
+    static getCredentials(pool) {
+        let requestURI = SERVICE_URI;
+        if (pool) {
+            this.pool = pool;
+            requestURI += "?pool=" + pool;
+        }
         this.credentials = request({
             method: "GET",
-            uri: SERVICE_URI,
+            uri: requestURI,
         })
         .then(body => JSON.parse(body))
         .catch(e => {
@@ -52,18 +63,23 @@ class ServerCredentialManager {
      * @example CredentialManager.freeCredentials();
      */
     static freeCredentials() {
+        let requestURI = SERVICE_URI;
+        if (this.pool) {
+            requestURI += "?pool=" + pool;
+        }
         return this.credentials.then(credentials => {
             if (credentials) {
                 return request({
                     method: "PUT",
-                    uri: SERVICE_URI,
+                    uri: requestURI,
                     body: {
                         username: credentials.username
                     },
                     json: true
                 })
             }
-        }).catch(e => {
+        })
+        .catch(e => {
             throw e
         })
     }
@@ -72,15 +88,20 @@ class ServerCredentialManager {
      * Free credentials
      * @param property - property to update
      * @param value - value to update
+     * @param [pool] - pool to update
      * @throws {Error}
      * @example CredentialManager.updateProperty("cookie", "myCookie");
      */
-    static updateProperty(property, value) {
+    static updateProperty(property, value, pool) {
+        let requestURI = SERVICE_URI + "/update";
+        if (pool) {
+            requestURI += "?pool=" + pool;
+        }
         return this.credentials.then(credentials => {
             if (credentials) {
                 return request({
                     method: "PUT",
-                    uri: SERVICE_URI + "/update",
+                    uri: requestURI,
                     body: {
                         username: credentials.username,
                         property: property,
@@ -89,7 +110,8 @@ class ServerCredentialManager {
                     json: true
                 })
             }
-        }).catch(e => {
+        })
+        .catch(e => {
             throw e
         })
     }
@@ -97,16 +119,21 @@ class ServerCredentialManager {
     /**
      * Return specified credentials by username
      * @param username - username to get
+     * @param [pool] - pool to update
      * @return {Promise<Object>} - promise that resolves with set of credentials
      * @throws {Error}
      * @example
      * CredentialManager.getCredentialsByUsername(ta1@email.com);
      * const currentCredentials = await CredentialManager.credentials;
      */
-    static getCredentialsByUsername(username) {
+    static getCredentialsByUsername(username, pool) {
+        let requestURI = SERVICE_URI + "/" + username;
+        if (pool) {
+            requestURI += "?pool=" + pool;
+        }
         this.credentials = request({
             method: "GET",
-            uri: SERVICE_URI + "/" + username,
+            uri: requestURI,
         })
         .then(body => JSON.parse(body))
         .catch(e => {

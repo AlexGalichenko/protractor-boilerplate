@@ -14,7 +14,7 @@ class CredentialServer {
 
         this.server.post("/credentials", (req, res) => {
             try {
-                this.db.createPool(req.body);
+                this.db.createPool(req.body.creds, req.query.pool);
                 res.sendStatus(201);
             } catch (e) {
                 res.status(500).send(null);
@@ -23,7 +23,7 @@ class CredentialServer {
 
         this.server.get("/credentials", (req, res) => {
             try {
-                const user = this.db.getCredentials();
+                const user = this.db.getCredentials(req.query.pool);
                 res.status(200).send(user);
             } catch (e) {
                 res.status(500).send(null);
@@ -32,7 +32,7 @@ class CredentialServer {
 
         this.server.get("/credentials/:username", (req, res) => {
             try {
-                const user = this.db.getCredentialsByUsername(req.params.username);
+                const user = this.db.getCredentialsByUsername(req.params.username, req.query.pool);
                 res.status(200).send(user);
             } catch (e) {
                 res.status(500).send(null);
@@ -41,7 +41,7 @@ class CredentialServer {
 
         this.server.put("/credentials", (req, res) => {
             try {
-                this.db.freeCredentials(req.body.username);
+                this.db.freeCredentials(req.body.username, req.query.pool);
                 res.sendStatus(200);
             } catch (e) {
                 res.status(500).send(null);
@@ -50,7 +50,7 @@ class CredentialServer {
 
         this.server.put("/credentials/update", (req, res) => {
             try {
-                this.db.updateProperty(req.body.username, req.body.property, req.body.value);
+                this.db.updateProperty(req.body.username, req.body.property, req.body.value, req.query.pool);
                 res.sendStatus(200);
             } catch (e) {
                 res.status(500).send(null);
@@ -59,7 +59,7 @@ class CredentialServer {
 
         this.server.get("/state", (req, res) => {
             try {
-                res.status(200).send(this.db.credentials);
+                res.status(200).send(this.db);
             } catch (e) {
                 res.status(500).send(e);
             }
