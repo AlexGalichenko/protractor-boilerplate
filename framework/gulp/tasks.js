@@ -8,12 +8,11 @@ const {protractor} = require("gulp-protractor");
 const server = require("gulp-express");
 const Reporter = require("../../framework/reporter/Reporter");
 const TasksKiller = require("../../framework/taskskiller/TasksKiller");
-const CredentialManager = require("../credential_manager/ServerCredentialManager");
 const GherkinPrecompiler = require("../gherkin_precompiler/GherkinPrecompiler");
 const child_process = require("child_process");
 const {update} = require("webdriver-manager-replacement");
 
-module.exports = function (gulp, envs, credentialManagerClass = CredentialManager) {
+module.exports = function (gulp) {
 
     gulp.task("folders:create", () => {
         fs.emptyDirSync("./dist");
@@ -47,7 +46,7 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
         });
     });
 
-    gulp.task("test", ["test:gherkin_precompile", "c_server"], () => {
+    gulp.task("test", ["test:gherkin_precompile"], () => {
         const config = getConfig();
         return gulp.src([])
             .pipe(protractor({
@@ -73,12 +72,6 @@ module.exports = function (gulp, envs, credentialManagerClass = CredentialManage
     gulp.task("report", () => {
         const config = getConfig();
         generateReport(config);
-    });
-
-    gulp.task("c_server", () => {
-        if (yargs.argv.credentialServerPort) {
-            server.run([__dirname + "/credential_server.js", "--credentialServerPort", yargs.argv.credentialServerPort]);
-        }
     });
 
 };
