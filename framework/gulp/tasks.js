@@ -5,7 +5,6 @@ const {parseGulpArgs} = require("../helpers/utils");
 const yargs = require("../helpers/yargs").argv;
 const clean = require("gulp-clean");
 const {protractor} = require("gulp-protractor");
-const server = require("gulp-express");
 const Reporter = require("../../framework/reporter/Reporter");
 const TasksKiller = require("../../framework/taskskiller/TasksKiller");
 const GherkinPrecompiler = require("../gherkin_precompiler/GherkinPrecompiler");
@@ -56,12 +55,10 @@ module.exports = function (gulp) {
                 debug: yargs.debug === "true"
             }))
             .on("end", function () {
-                server.stop();
                 console.log("E2E Testing complete");
                 generateReport(config);
             })
             .on("error", function (error) {
-                server.stop();
                 generateReport(config);
                 console.log("E2E Tests failed");
             })
