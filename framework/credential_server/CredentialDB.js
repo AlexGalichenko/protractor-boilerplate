@@ -52,8 +52,6 @@ class CredentialDB {
             poolRef[freeUserIndex].freeTimeout();
             const normalizedObject = Object.assign({}, poolRef[freeUserIndex]);
             normalizedObject.timeout = null;
-            console.log(poolRef[freeUserIndex].timeout);
-            console.log(normalizedObject.timeout);
             return normalizedObject;
         } else {
             throw new Error("There are no free users");
