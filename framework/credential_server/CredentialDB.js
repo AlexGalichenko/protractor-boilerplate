@@ -14,7 +14,7 @@ class CredentialDB {
      * @param {string} pool - name of pool
      */
     createPool(creds, pool) {
-        const FREE_USER_TIMEOUT = 10 * 60 * 1000;
+        const FREE_USER_TIMEOUT = 6 * 60 * 1000;
 
         const credentials = creds.map(item => {
             item.isLocked = false;
