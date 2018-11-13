@@ -19,7 +19,7 @@ class CredentialDB {
         const credentials = creds.map(item => {
             item.isLocked = false;
             item.freeTimeout = function() {
-                setTimeout(() => {
+                this.timeout = setTimeout(() => {
                     this.isLocked = false;
                 }, FREE_USER_TIMEOUT)
             };
@@ -50,7 +50,11 @@ class CredentialDB {
         if (freeUserIndex !== -1) {
             poolRef[freeUserIndex].isLocked = true;
             poolRef[freeUserIndex].freeTimeout();
-            return poolRef[freeUserIndex];
+            const normalizedObject = Object.assign({}, poolRef[freeUserIndex]);
+            normalizedObject.timeout = null;
+            console.log(poolRef[freeUserIndex].timeout);
+            console.log(normalizedObject.timeout);
+            return normalizedObject;
         } else {
             throw new Error("There are no free users");
         }
@@ -71,6 +75,7 @@ class CredentialDB {
 
         if (userIndex !== -1) {
             poolRef[userIndex].isLocked = false;
+            clearTimeout(poolRef[userIndex].timeout);
         }
     }
 
@@ -115,7 +120,9 @@ class CredentialDB {
         if (freeUserIndex !== -1) {
             poolRef[freeUserIndex].isLocked = true;
             poolRef[freeUserIndex].freeTimeout();
-            return poolRef[freeUserIndex];
+            const normalizedObject = Object.assign({}, poolRef[freeUserIndex]);
+            normalizedObject.timeout = null;
+            return normalizedObject;
         } else {
             throw new Error("There are no users with username: " + username);
         }
