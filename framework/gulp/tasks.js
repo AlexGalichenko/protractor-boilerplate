@@ -14,8 +14,9 @@ const {update} = require("webdriver-manager-replacement");
 module.exports = function (gulp) {
 
     gulp.task("folders:create", () => {
-        fs.emptyDirSync("./dist");
-        fs.mkdirsSync("./dist/temp_features");
+        const config = getConfig();
+        fs.emptyDirSync(config.boilerplateOpts.tempFolder);
+        fs.mkdirsSync(config.boilerplateOpts.tempFolder + "temp_features");
     });
 
     gulp.task("webdriver:update", () => {
@@ -40,17 +41,20 @@ module.exports = function (gulp) {
 
     gulp.task("test:gherkin_precompile", ["webdriver:update", "folders:create"], () => {
         const config = getConfig();
-        return new GherkinPrecompiler(config.specs, yargs.argv.tags).compile().catch(e => {
-            throw e
-        });
+        return new GherkinPrecompiler(config.specs, yargs.argv.tags, config.boilerplateOpts.tempFolder + "temp_features")
+            .compile()
+            .catch(e => {
+                throw e
+            });
     });
 
     gulp.task("test", ["test:gherkin_precompile"], () => {
         const config = getConfig();
+        const tempSpec = config.boilerplateOpts.tempFolder + "temp_features/*.feature";
         return gulp.src([])
             .pipe(protractor({
                 configFile: getConfigFile(),
-                args: parseGulpArgs(yargs.argv),
+                args: parseGulpArgs(yargs.argv, tempSpec),
                 autoStartStopServer: true,
                 debug: yargs.debug === "true"
             }))
@@ -59,8 +63,8 @@ module.exports = function (gulp) {
                 generateReport(config);
             })
             .on("error", function (error) {
-                generateReport(config);
                 console.log("E2E Tests failed");
+                generateReport(config);
             })
     });
 
