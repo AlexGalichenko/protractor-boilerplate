@@ -51,11 +51,12 @@ function prepareFolders() {
  * Parse gulp args
  * @private
  * @param {{env, tags, browser, i, baseUrl}} env
+ * @param {string} [tempSpec] - pattern for temporary spec
  * @return {Array} array of args
  */
-function parseGulpArgs(env) {
+function parseGulpArgs(env, tempSpec) {
     const args = [
-        "--specs", "./dist/temp_features/*.feature",
+        "--specs", tempSpec || "./dist/temp_features/*.feature",
         "--params.environment", env.env,
         "--cucumberOpts.tags", env.tags,
         "--capabilities.browserName", env.browser || "chrome",
