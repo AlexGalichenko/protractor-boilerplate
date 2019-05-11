@@ -1,3 +1,15 @@
+This project is no more supported. All works are moved to cucumber-e2e set of projects. Please address your questions and issues here
+
+PO https://github.com/AlexGalichenko/cucumber-e2e-po https://www.npmjs.com/package/@cucumber-e2e/po
+
+Feature paralelizator https://github.com/AlexGalichenko/cucumber-e2e-gherkin-parallel https://www.npmjs.com/package/@cucumber-e2e/gherkin-parallel
+
+HTML Reporter https://github.com/AlexGalichenko/cucumber-e2e-html-reporter https://www.npmjs.com/package/@cucumber-e2e/html-reporter
+
+Memory manager https://github.com/AlexGalichenko/cucumber-e2e-memory https://www.npmjs.com/package/@cucumber-e2e/memory
+
+Credential Manager https://github.com/AlexGalichenko/cucumber-e2e-credential-manager https://www.npmjs.com/package/@cucumber-e2e/credential-manager
+
 # How to run
 
 * `gulp test --env dev --tags "@debug"`
